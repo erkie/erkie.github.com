@@ -48,7 +48,7 @@ function Asteroids()
 	
 	// things to shoot is everything textual and an element of type not specified in types AND not a navigation element (see further down)
 	function updateEnemyIndex() {		
-		var all = document.getElementsByTagName('*');
+		var all = document.body.getElementsByTagName('*');
 		that.enemies = [];
 		for ( var i = 0; i < all.length; i++ ) {
 			if ( indexOf(types, all[i].tagName) == -1 && hasOnlyTextualChildren(all[i]) && all[i].className != "ASTEROIDSYEAH" )
