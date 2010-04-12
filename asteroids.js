@@ -41,6 +41,7 @@ function Asteroids()
 	// Enemies lay first in this.enemies, when they are shot they are moved to this.dieing
 	this.enemies = [];
 	this.dieing = [];
+	this.totalEnemies = 0;
 	
 	// Particles are created when something is shot
 	this.particles = [];
@@ -55,7 +56,8 @@ function Asteroids()
 				all[i].aSize = size(all[i]);
 				that.enemies.push(all[i]);
 			}
-		}		
+		}
+		that.totalEnemies = Math.max(that.enemies.length, that.totalEnemies);
 	};
 	updateEnemyIndex();
 	
@@ -272,7 +274,7 @@ function Asteroids()
 	this.points.className = "ASTEROIDSYEAH";
 	this.navigation.appendChild(this.points);
 	
-	this.points.innerHTML = "0/" + this.enemies.length;
+	this.points.innerHTML = "0/" + this.totalEnemies;
 	
 	/*
 		== Events ==
@@ -508,7 +510,7 @@ function Asteroids()
 			} catch ( e ) {}
 			
 			this.enemiesKilled++;
-			this.points.innerHTML = this.enemiesKilled + "/" + this.enemies.length;
+			this.points.innerHTML = this.enemiesKilled + "/" + this.totalEnemies;
 			
 			arrayRemove(this.dieing, i);
 			i--;
