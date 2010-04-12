@@ -246,15 +246,17 @@ function Asteroids()
 		right = "0px";
 		zIndex = "10000";
 	}
-	document.body.appendChild(this.canvas);
-	if ( typeof G_vmlCanvasManager != 'undefined' )
-	{
+	if ( typeof G_vmlCanvasManager != 'undefined' ) {
 		this.canvas = G_vmlCanvasManager.initElement(this.canvas);
+		if ( ! this.canvas.getContext ) {
+			alert("So... you're using IE?  Please contact me at erik.rothoff@gmail.com if you want me to work on it");
+		}
+	} else {
+		if ( ! this.canvas.getContext ) {
+			alert('This program does not yet support your browser. Please contact me at erik.rothoff@gmail.com if you want me to work on it');
+		}
 	}
-	if ( ! this.canvas.getContext )
-	{
-		alert('This program does not yet support your browser. Please contact me at erik.rothoff@gmail.com if you want me to work on it');
-	}
+	document.body.appendChild(this.canvas);
 	this.ctx = this.canvas.getContext("2d");
 	
 	this.ctx.fillStyle = "black";
@@ -577,7 +579,7 @@ if ( window.ActiveXObject )
 	try {
     	var xamlScript = document.createElement('script');
 	    xamlScript.setAttribute('type', 'text/xaml');
-	    xamlScript.innerHTML = '<?xml version="1.0"?><Canvas xmlns="http://schemas.microsoft.com/client/2007"></Canvas>';
+	    xamlScript.textContent = '<?xml version="1.0"?><Canvas xmlns="http://schemas.microsoft.com/client/2007"></Canvas>';
 		document.getElementsByTagName('head')[0].appendChild(xamlScript);
 	} catch ( e ) {}
 	
