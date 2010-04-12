@@ -55,9 +55,12 @@ function Asteroids()
 			{
 				all[i].aSize = size(all[i]);
 				that.enemies.push(all[i]);
+				if ( ! all[i].aCounted ) {
+					all[i].aAdded = true;
+					that.totalEnemies++;
+				}
 			}
 		}
-		that.totalEnemies = Math.max(that.enemies.length, that.totalEnemies);
 	};
 	updateEnemyIndex();
 	
