@@ -31,7 +31,7 @@ function Asteroids()
 	this.dir = {x: 0, y: 1};
 	this.keysPressed = {};
 	this.firedAt = false;
-	this.updated = {
+	this.updated = {
 		enemies: new Date().getTime(),
 		flame: new Date().getTime()
 	};
