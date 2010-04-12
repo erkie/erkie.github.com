@@ -9,7 +9,7 @@ function Asteroids()
 	var playerWidth = 20, playerHeight = 30;
 	var playerVerts = [[-1 * playerWidth / 2, -15], [playerWidth / 2, -15], [0, 15]];
 	var flame = {r: [], y: []}; // generated every 10 ms
-	var types = ['HTML', 'HEAD', 'BODY', 'SCRIPT', 'TITLE', 'CANVAS'];
+	var types = ['HTML', 'HEAD', 'BODY', 'SCRIPT', 'TITLE', 'CANVAS', 'META', 'STYLE'];
 	
 	// units/second
 	var speed = 5, maxSpeed = 10;
@@ -294,7 +294,7 @@ function Asteroids()
 	};
 	
 	document.onkeypress = function(event) {
-		event = event || window.event;
+		event = event || window.event;
 		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' ')], event.keyCode || event.which) != -1 )
 			return false;
 	};
