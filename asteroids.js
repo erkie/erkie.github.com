@@ -6,13 +6,15 @@ function Asteroids()
 	
 	// configuration directions are placed in local variables
 	var w = document.documentElement.clientWidth, h = document.documentElement.clientHeight;
-	var playerVerts = [[-5, -7.5], [5, -7.5], [0, 7.5]];
+	var playerWidth = 20, playerHeight = 30;
+	var playerVerts = [[-1 * playerWidth / 2, -15], [playerWidth / 2, -15], [0, 15]];
+	var flame = {r: [], y: []}; // generated every 10 ms
 	var types = ['HTML', 'HEAD', 'BODY', 'SCRIPT', 'TITLE', 'CANVAS'];
 	
 	// units/second
-	var speed = 5, maxSpeed = 25;
+	var speed = 5, maxSpeed = 10;
 	var rotSpeed = 360;
-	var bulletSpeed = 400;
+	var bulletSpeed = 500;
 	var particleSpeed = 400;
 	
 	var timeBetweenFire = 150; // how many milliseconds between shots
@@ -27,7 +29,10 @@ function Asteroids()
 	this.dir = {x: 0, y: 1};
 	this.keysPressed = {};
 	this.firedAt = false;
-	this.indexLastUpdated = new Date().getTime();
+	this.updated = {
+		enemies: new Date().getTime(),
+		flame: new Date().getTime()
+	};
 	this.bullets = [];
 	this.scrollPos = {x: 0, y: 0};
 	
@@ -50,6 +55,37 @@ function Asteroids()
 		}		
 	};
 	updateEnemyIndex();
+	
+	function createFlames() {
+		// Firstly create red flames
+		flame.r = [[0, 0]];
+		flame.y = [[0, 0]];
+		
+		var rWidth = playerWidth;
+		var rIncrease = playerWidth * 0.1;
+		for ( var x = 0; x < rWidth; x += rIncrease ) 
+			flame.r.push([x, -random(2, 7)]);
+		flame.r.push([rWidth, 0]);
+		
+		var yWidth = playerWidth * 0.6;
+		var yIncrease = yWidth * 0.2;
+		for ( var x = 0; x < yWidth; x += yIncrease )
+			flame.y.push([x, -random(1, 4)]);
+		flame.y.push([yWidth, 0]);
+		
+		// Center 'em
+		var halfR = rWidth / 2, halfY = yWidth / 2;
+		for ( var i = 0; i < flame.r.length; i++ ) {
+			flame.r[i][0] -= halfR;
+			flame.r[i][1] -= playerHeight / 2;
+		}
+		
+		for ( var i = 0; i < flame.y.length; i++ ) {
+			flame.y[i][0] -= halfY;
+			flame.y[i][1] -= playerHeight / 2;
+		}
+	};
+	createFlames();
 	
 	/*
 		Math operations
@@ -111,6 +147,10 @@ function Asteroids()
 	
 	function collidesWith(point, rect) {
 		return point.x > rect.x && point.y > rect.y && point.x < rect.x + rect.width && point.y < rect.y + rect.height;
+	};
+	
+	function random(from, to) {
+		return Math.floor(Math.random() * (to + 1) + from);
 	};
 	
 	/*
@@ -203,6 +243,10 @@ function Asteroids()
 	{
 		this.canvas = G_vmlCanvasManager.initElement(this.canvas);
 	}
+	if ( ! this.canvas.getContext )
+	{
+		alert('This program does not yet support your browser. Please contact me at erik.rothoff@gmail.com if you want me to work on it');
+	}
 	this.ctx = this.canvas.getContext("2d");
 	
 	this.ctx.fillStyle = "black";
@@ -281,6 +325,25 @@ function Asteroids()
 		this.drawLine(particle.pos.x, particle.pos.y, particle.pos.x - particle.dir.x * 10, particle.pos.y - particle.dir.y * 10);
 	};
 	
+	this.ctx.drawFlames = function(flame) {
+		this.save();
+		
+		this.translate(that.pos.x, that.pos.y);
+		this.rotate(-angle(that.dir));
+		
+		var oldColor = this.strokeStyle;
+		this.strokeStyle = "red";
+		this.tracePoly(flame.r);
+		this.stroke();
+		
+		this.strokeStyle = "yellow";
+		this.tracePoly(flame.y);
+		this.stroke();
+		
+		this.strokeStyle = oldColor;
+		this.restore();
+	}
+	
 	/*
 		Game loop
 	*/
@@ -295,20 +358,29 @@ function Asteroids()
 		var tDelta = (nowTime - lastUpdate) / 1000;
 		lastUpdate = nowTime;
 		
-		if ( nowTime - this.indexLastUpdated > 5000 )
-		{
+		// check enemy index timer and update that if needed
+		if ( nowTime - this.updated.enemies > 5000 ) {
 			updateEnemyIndex();
-			this.indexLastUpdated = nowTime;
+			this.updated.enemies = nowTime;
+		}
+		
+		// update flame and timer if needed
+		var drawFlame = false;
+		if ( nowTime - this.updated.flame > 50 ) {
+			createFlames();
+			this.updated.flame = nowTime;
 		}
 		
 		this.scrollPos.x = window.pageXOffset || document.documentElement.scrollLeft;
 		this.scrollPos.y = window.pageYOffset || document.documentElement.scrollTop;
 		
-		// update
+		// update player
 		if ( this.keysPressed[code('up')] ) { // move forward
 			var l = len(this.vel) || 1;
 			if ( l < 1 ) l *= 1.4;
 			this.vel = add(this.vel, mul(this.dir, speed * tDelta * l));
+			
+			drawFlame = true;
 		}
 		
 		if ( this.keysPressed[code('left')] ) { // rotate counter-clockwise
@@ -351,12 +423,12 @@ function Asteroids()
 		
 		if ( this.pos.y > h )
 		{
-			window.scrollTo(this.scrollPos.x, this.scrollPos.y + 100);
+			window.scrollTo(this.scrollPos.x, this.scrollPos.y + h * 0.75);
 			this.pos.y = 0;
 		}
 		else if ( this.pos.y < 0 )
 		{
-			window.scrollTo(this.scrollPos.x, this.scrollPos.y - 100);
+			window.scrollTo(this.scrollPos.x, this.scrollPos.y - h * 0.75);
 			this.pos.y = h;	
 		}
 		
@@ -373,7 +445,7 @@ function Asteroids()
 				continue;
 			}
 			
-			this.bullets[i].pos = add(this.bullets[i].pos, mul(this.bullets[i].dir, bulletSpeed * tDelta));
+			this.bullets[i].pos = add(this.bullets[i].pos, setLength(this.bullets[i].dir, bulletSpeed * tDelta));
 			boundsCheck(this.bullets[i].pos);
 			
 			// check collisions
@@ -414,7 +486,6 @@ function Asteroids()
 		// update particles position
 		for ( var i = 0; i < this.particles.length; i++ ) {
 			this.particles[i].pos = add(this.particles[i].pos, mul(this.particles[i].dir, particleSpeed * tDelta * Math.random()));
-			boundsCheck(this.particles[i].pos);
 			
 			if ( nowTime - this.particles[i].cameAlive > 1000 ) {
 				arrayRemove(this.particles, i);
@@ -433,11 +504,17 @@ function Asteroids()
 		// draw player
 		this.ctx.drawPlayer();
 		
+		// draw flames
+		if ( drawFlame ) {
+			this.ctx.drawFlames(flame);
+		}
+		
 		// draw bullets
 		for ( var i = 0; i < this.bullets.length; i++ ) {
 			this.ctx.drawBullet(this.bullets[i].pos);
 		}
 		
+		// draw particles
 		for ( var i = 0; i < this.particles.length; i++ ) {
 			this.ctx.drawParticle(this.particles[i]);
 		}
@@ -454,6 +531,13 @@ function Asteroids()
 
 if ( window.ActiveXObject )
 {
+	try {
+    	var xamlScript = document.createElement('script');
+	    xamlScript.setAttribute('type', 'text/xaml');
+	    xamlScript.innerHTML = '<?xml version="1.0"?><Canvas xmlns="http://schemas.microsoft.com/client/2007"></Canvas>';
+		document.getElementsByTagName('head')[0].appendChild(xamlScript);
+	} catch ( e ) {}
+	
 	var script = document.createElement("script");
     script.setAttribute('type', 'text/javascript');
 	script.onreadystatechange = function() {
@@ -463,13 +547,6 @@ if ( window.ActiveXObject )
 	};
     script.src = "excanvas.js";    
 	document.getElementsByTagName('head')[0].appendChild(script);
-	
-	try {
-    	var xamlScript = document.createElement('script');
-	    xamlScript.setAttribute('type', 'text/xaml');
-	    xamlScript.innerHTML = '<?xml version="1.0"?><Canvas xmlns="http://schemas.microsoft.com/client/2007"></Canvas>';
-		document.getElementsByTagName('head')[0].appendChild(xamlScript);
-	} catch ( e ) {}
 }
 else
 	new Asteroids();
