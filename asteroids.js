@@ -61,6 +61,7 @@ function Asteroids()
 				}
 			}
 		}
+		console.log(that.enemies);
 	};
 	updateEnemyIndex();
 	
