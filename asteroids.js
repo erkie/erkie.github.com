@@ -22,6 +22,8 @@ function Asteroids()
 	var maxParticles = isIE ? 10 : 40;
 	var maxBullets = isIE ? 10 : 20;
 	
+	this.enemiesKilled = 0; // points
+	
 	var FPS = isIE ? 30 : 50;
 	
 	this.pos = {x: 100, y: 100};
@@ -43,11 +45,12 @@ function Asteroids()
 	// Particles are created when something is shot
 	this.particles = [];
 	
-	// things to shoot is everything textual and an element of type not specified in types
+	// things to shoot is everything textual and an element of type not specified in types AND not a navigation element (see further down)
 	function updateEnemyIndex() {		
 		var all = document.getElementsByTagName('*');
+		that.enemies = [];
 		for ( var i = 0; i < all.length; i++ ) {
-			if ( indexOf(types, all[i].tagName) == -1 && hasOnlyTextualChildren(all[i]) )
+			if ( indexOf(types, all[i].tagName) == -1 && hasOnlyTextualChildren(all[i]) && all[i].className != "ASTEROIDSYEAH" )
 			{
 				all[i].aSize = size(all[i]);
 				that.enemies.push(all[i]);
@@ -158,7 +161,7 @@ function Asteroids()
 	*/
 	
 	function code(name) {
-		var table = {'up': 38, 'down': 40, 'left': 37, 'right': 39};
+		var table = {'up': 38, 'down': 40, 'left': 37, 'right': 39, 'esc': 27};
 		if ( table[name] ) return table[name];
 		return name.charCodeAt(0);
 	};
@@ -251,6 +254,25 @@ function Asteroids()
 	
 	this.ctx.fillStyle = "black";
 	this.ctx.strokeStyle = "black";
+	
+	this.navigation = document.createElement('div');
+	this.navigation.className = "ASTEROIDSYEAH";
+	with ( this.navigation.style ) {
+		font = "Arial,sans-serif";
+		position = "fixed";
+		zIndex = "10001";
+		bottom = "10px";
+		right = "10px";
+	}
+	this.navigation.innerHTML = "(esc to quit) ";
+	document.body.appendChild(this.navigation);
+	
+	this.points = document.createElement('span');
+	this.points.style.font = "28pt bold Arial,sans-serif";
+	this.points.className = "ASTEROIDSYEAH";
+	this.navigation.appendChild(this.points);
+	
+	this.points.innerHTML = "0/" + this.enemies.length;
 	
 	/*
 		== Events ==
@@ -348,6 +370,7 @@ function Asteroids()
 		Game loop
 	*/
 	
+	var isRunning = true;
 	var lastUpdate = new Date().getTime();
 	this.update = function() {
 		// ==
@@ -399,6 +422,11 @@ function Asteroids()
 			if ( this.bullets.length > maxBullets ) {
 				arrayRemove(this.bullets, 0);
 			}
+		}
+		
+		if ( this.keysPressed[code('esc')] ) {
+			destroy.apply(this);
+			return;
 		}
 		
 		// cap speed
@@ -479,6 +507,9 @@ function Asteroids()
 				enemy.parentNode.removeChild(enemy);
 			} catch ( e ) {}
 			
+			this.enemiesKilled++;
+			this.points.innerHTML = this.enemiesKilled + "/" + this.enemies.length;
+			
 			arrayRemove(this.dieing, i);
 			i--;
 		}
@@ -527,6 +558,13 @@ function Asteroids()
 		that.update.call(that);
 	};
 	setTimeout(updateFunc, 1000 / FPS);
+	
+	function destroy() {
+		window.onkeydown = window.onkeypress = window.onkeyup;
+		isRunning = false;
+		this.canvas.parentNode.removeChild(this.canvas);
+		this.navigation.parentNode.removeChild(this.navigation);
+	};
 }
 
 if ( window.ActiveXObject )
