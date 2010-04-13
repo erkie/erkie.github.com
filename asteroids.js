@@ -55,7 +55,7 @@ function Asteroids()
 			{
 				all[i].aSize = size(all[i]);
 				that.enemies.push(all[i]);
-				if ( ! all[i].aCounted ) {
+				if ( ! all[i].aAdded ) {
 					all[i].aAdded = true;
 					that.totalEnemies++;
 				}
@@ -510,11 +510,12 @@ function Asteroids()
 		
 		// Remove all dieing elements
 		for ( var i = 0, enemy; enemy = this.dieing[i]; i++ ) {
+			this.enemiesKilled++;
+			
 			try {
 				enemy.parentNode.removeChild(enemy);
 			} catch ( e ) {}
 			
-			this.enemiesKilled++;
 			this.points.innerHTML = this.enemiesKilled + "/" + this.totalEnemies;
 			
 			arrayRemove(this.dieing, i);
