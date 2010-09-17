@@ -1,3 +1,4 @@
+(function() {
 function Asteroids() {
 	/*
 		Classes
@@ -407,6 +408,28 @@ function Asteroids() {
 		return {x: left, y: top, width: element.offsetWidth || 10, height: element.offsetHeight || 10};
 	};
 	
+	// Taken from:
+	// http://www.quirksmode.org/blog/archives/2005/10/_and_the_winner_1.html
+	function addEvent( obj, type, fn ) {
+		if (obj.addEventListener)
+			obj.addEventListener( type, fn, false );
+		else if (obj.attachEvent) {
+			obj["e"+type+fn] = fn;
+			obj[type+fn] = function() { obj["e"+type+fn]( window.event ); }
+			obj.attachEvent( "on"+type, obj[type+fn] );
+		}
+	}
+
+	function removeEvent( obj, type, fn ) {
+		if (obj.removeEventListener)
+			obj.removeEventListener( type, fn, false );
+		else if (obj.detachEvent) {
+			obj.detachEvent( "on"+type, obj[type+fn] );
+			obj[type+fn] = null;
+			obj["e"+type+fn] = null;
+		}
+	}
+	
 	function arrayRemove(array, from, to) {
 		var rest = array.slice((to || from) + 1 || array.length);
 		array.length = from < 0 ? array.length + from : from;
@@ -497,6 +520,7 @@ function Asteroids() {
 		right = "0px";
 		zIndex = "10000";
 	}
+	
 	if ( typeof G_vmlCanvasManager != 'undefined' ) {
 		this.canvas = G_vmlCanvasManager.initElement(this.canvas);
 		if ( ! this.canvas.getContext ) {
@@ -507,6 +531,11 @@ function Asteroids() {
 			alert('This program does not yet support your browser. Please join me at http://github.com/erkie/erkie.github.com if you think you can help');
 		}
 	}
+	
+	addEvent(this.canvas, 'click', function() {
+		destroy.apply(that);
+	});
+	
 	document.body.appendChild(this.canvas);
 	this.ctx = this.canvas.getContext("2d");
 	
@@ -524,7 +553,7 @@ function Asteroids() {
 		right = "10px";
 		textAlign = "right";
 	}
-	this.navigation.innerHTML = "(esc to quit) ";
+	this.navigation.innerHTML = "(click anywhere to exit/press esc to quit) ";
 	document.body.appendChild(this.navigation);
 	
 	// points
@@ -560,9 +589,10 @@ function Asteroids() {
 		== Events ==
 	*/
 	
-	document.onkeydown = function(event) {
+	var eventKeydown =  function(event) {
 		event = event || window.event;
 		that.keysPressed[event.keyCode] = true;
+		
 		switch ( event.keyCode ) {
 			case code(' '):
 				that.firedAt = 1;
@@ -570,17 +600,25 @@ function Asteroids() {
 		}
 		
 		// check here so we can stop propogation appropriately
-		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('B')], event.keyCode) != -1 )
+		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('B')], event.keyCode) != -1 ) {
+			if ( event.preventDefault )
+				event.preventDefault();
 			return false;
+		}
 	};
+	addEvent(window, 'keydown', eventKeydown);
 	
-	document.onkeypress = function(event) {
+	var eventKeypress = function(event) {
 		event = event || window.event;
-		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' ')], event.keyCode || event.which) != -1 )
+		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' ')], event.keyCode || event.which) != -1 ) {
+			if ( event.preventDefault )
+				event.preventDefault();
 			return false;
+		}
 	};
+	addEvent(window, 'keypress', eventKeypress);
 	
-	document.onkeyup = function(event) {
+	var eventKeyup = function(event) {
 		event = event || window.event;
 		that.keysPressed[event.keyCode] = false;
 		switch ( event.keyCode ) {
@@ -588,9 +626,13 @@ function Asteroids() {
 				removeStylesheet("ASTEROIDSYEAH");
 			break;
 		}
-		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('B')], event.keyCode) != -1 )
+		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('B')], event.keyCode) != -1 ) {
+			if ( event.preventDefault )
+				event.preventDefault();
 			return false;
-	}
+		}
+	};
+	addEvent(window, 'keyup', eventKeyup);
 	
 	/*
 		Context operations
@@ -681,6 +723,8 @@ function Asteroids() {
 	/*
 		Game loop
 	*/
+	
+	addParticles(this.pos);
 	
 	var isRunning = true;
 	var lastUpdate = new Date().getTime();
@@ -865,6 +909,7 @@ function Asteroids() {
 			if ( nowTime - this.particles[i].cameAlive > 1000 ) {
 				arrayRemove(this.particles, i);
 				i--;
+				forceChange = true;
 				continue;
 			}
 		}
@@ -904,7 +949,9 @@ function Asteroids() {
 	setTimeout(updateFunc, 1000 / FPS);
 	
 	function destroy() {
-		window.onkeydown = window.onkeypress = window.onkeyup = null;
+		removeEvent(window, 'keydown', eventKeydown);
+		removeEvent(window, 'keypress', eventKeypress);
+		removeEvent(window, 'keyup', eventKeyup);
 		isRunning = false;
 		removeStylesheet("ASTEROIDSYEAH");
 		this.canvas.parentNode.removeChild(this.canvas);
@@ -931,3 +978,5 @@ if ( window.ActiveXObject ) {
 	document.getElementsByTagName('head')[0].appendChild(script);
 }
 else new Asteroids();
+
+})();
