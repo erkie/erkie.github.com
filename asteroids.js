@@ -532,7 +532,7 @@ function Asteroids() {
 		}
 	}
 	
-	addEvent(this.canvas, 'click', function() {
+	addEvent(this.canvas, 'mousedown', function() {
 		destroy.apply(that);
 	});
 	
@@ -726,6 +726,7 @@ function Asteroids() {
 	*/
 	
 	addParticles(this.pos);
+	addClass(document.body, 'ASTEROIDSYEAH');
 	
 	var isRunning = true;
 	var lastUpdate = new Date().getTime();
@@ -955,6 +956,7 @@ function Asteroids() {
 		removeEvent(window, 'keyup', eventKeyup);
 		isRunning = false;
 		removeStylesheet("ASTEROIDSYEAH");
+		removeClass(document.body, 'ASTEROIDSYEAH');
 		this.canvas.parentNode.removeChild(this.canvas);
 		this.navigation.parentNode.removeChild(this.navigation);
 	};
