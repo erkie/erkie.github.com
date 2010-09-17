@@ -100,7 +100,7 @@ function Asteroids() {
 			return Math.atan2(this.x, this.y);
 		},
 		
-		collidesWith: function(rect) {
+		collidesWith: function(rect) {
 			return this.x > rect.x && this.y > rect.y && this.x < rect.x + rect.width && this.y < rect.y + rect.height;
 		},
 		
