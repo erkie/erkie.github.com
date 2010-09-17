@@ -558,7 +558,8 @@ function Asteroids() {
 	
 	// points
 	this.points = document.createElement('span');
-	this.points.style.font = "28pt bold Arial,sans-serif";
+	this.points.style.font = "28pt Arial, sans-serif";
+	this.points.style.fontWeight = "bold";
 	this.points.className = "ASTEROIDSYEAH";
 	this.navigation.appendChild(this.points);
 	
