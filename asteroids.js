@@ -610,7 +610,7 @@ function Asteroids() {
 		}
 		
 		// check here so we can stop propogation appropriately
-		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('B')], event.keyCode) != -1 ) {
+		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('B'), code('W'), code('A'), code('S'), code('D')], event.keyCode) != -1 ) {
 			if ( event.preventDefault )
 				event.preventDefault();
 			return false;
@@ -620,7 +620,7 @@ function Asteroids() {
 	
 	var eventKeypress = function(event) {
 		event = event || window.event;
-		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' ')], event.keyCode || event.which) != -1 ) {
+		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('W'), code('A'), code('S'), code('D')], event.keyCode || event.which) != -1 ) {
 			if ( event.preventDefault )
 				event.preventDefault();
 			return false;
@@ -636,7 +636,7 @@ function Asteroids() {
 				removeStylesheet("ASTEROIDSYEAH");
 			break;
 		}
-		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('B')], event.keyCode) != -1 ) {
+		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('B'), code('W'), code('A'), code('S'), code('D')], event.keyCode) != -1 ) {
 			if ( event.preventDefault )
 				event.preventDefault();
 			return false;
@@ -773,7 +773,7 @@ function Asteroids() {
 		
 		// update player
 		// move forward
-		if ( this.keysPressed[code('up')] ) {
+		if ( (this.keysPressed[code('up')]) || (this.keysPressed[code('W')]) ) {
 			this.vel.add(this.dir.mulNew(acc * tDelta));
 			
 			drawFlame = true;
@@ -783,13 +783,13 @@ function Asteroids() {
 		}
 		
 		// rotate counter-clockwise
-		if ( this.keysPressed[code('left')] ) {
+		if ( (this.keysPressed[code('left')]) || (this.keysPressed[code('A')]) ) {
 			forceChange = true;
 			this.dir.rotate(radians(rotSpeed * tDelta * -1));
 		}
 		
 		// rotate clockwise
-		if ( this.keysPressed[code('right')] ) {
+		if ( (this.keysPressed[code('right')]) || (this.keysPressed[code('D')]) ) {
 			forceChange = true;
 			this.dir.rotate(radians(rotSpeed * tDelta));
 		}
