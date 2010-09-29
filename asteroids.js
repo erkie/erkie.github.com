@@ -680,6 +680,9 @@ function Asteroids() {
 		this.translate(that.pos.x, that.pos.y);
 		this.rotate(-that.dir.angle());
 		this.tracePoly(playerVerts);
+		this.fillStyle = "white";
+		this.fill();
+		this.tracePoly(playerVerts);
 		this.stroke();
 		this.restore();
 	};
