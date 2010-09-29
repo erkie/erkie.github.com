@@ -536,6 +536,15 @@ function Asteroids() {
 		destroy.apply(that);
 	});
 	
+	var eventResize = function() {
+		w = document.documentElement.clientWidth;
+		h = document.documentElement.clientHeight;
+		
+		self.canvas.setAttribute('width', w);
+		self.canvas.setAttribute('height', h);
+	};
+	addEvent(window, 'resize', eventResize);
+	
 	document.body.appendChild(this.canvas);
 	this.ctx = this.canvas.getContext("2d");
 	
@@ -957,6 +966,7 @@ function Asteroids() {
 		removeEvent(window, 'keydown', eventKeydown);
 		removeEvent(window, 'keypress', eventKeypress);
 		removeEvent(window, 'keyup', eventKeyup);
+		removeEvent(window, 'resize', eventResize);
 		isRunning = false;
 		removeStylesheet("ASTEROIDSYEAH");
 		removeClass(document.body, 'ASTEROIDSYEAH');
