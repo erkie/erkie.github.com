@@ -864,6 +864,7 @@ function Asteroids() {
 			if ( nowTime - this.bullets[i].cameAlive > 2000 ) {
 				arrayRemove(this.bullets, i);
 				i--;
+				forceChange = true;
 				continue;
 			}
 			
