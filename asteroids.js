@@ -246,7 +246,7 @@ function Asteroids() {
 	var playerWidth = 20, playerHeight = 30;
 	var playerVerts = [[-1 * playerWidth / 2, -15], [playerWidth / 2, -15], [0, 15]];
 	
-	var ignoredTypes = ['HTML', 'HEAD', 'BODY', 'SCRIPT', 'TITLE', 'CANVAS', 'META', 'STYLE', 'LINK'];
+	var ignoredTypes = ['HTML', 'HEAD', 'BODY', 'SCRIPT', 'TITLE', 'CANVAS', 'META', 'STYLE', 'LINK', 'SHAPE', 'LINE', 'GROUP', 'IMAGE', 'STROKE', 'FILL', 'SKEW', 'PATH', 'TEXTPATH'];
 	var hiddenTypes = ['BR', 'HR'];
 	
 	var FPS = isIE ? 30 : 50;
@@ -304,23 +304,22 @@ function Asteroids() {
 	
 	// things to shoot is everything textual and an element of type not specified in types AND not a navigation element (see further down)
 	function updateEnemyIndex() {
-		for ( var i = 0, enemy; enemy = that.enemies[i]; i++ ) {
+		for ( var i = 0, enemy; enemy = that.enemies[i]; i++ )
 			removeClass(enemy, "ASTEROIDSYEAHENEMY");
-		}
 			
 		var all = document.body.getElementsByTagName('*');
 		that.enemies = [];
-		for ( var i = 0; i < all.length; i++ ) {
+		for ( var i = 0, el; el = all[i]; i++ ) {
 			// elements with className ASTEROIDSYEAH are part of the "game"
-			if ( indexOf(ignoredTypes, all[i].tagName) == -1 && hasOnlyTextualChildren(all[i]) && all[i].className != "ASTEROIDSYEAH" ) {
-				all[i].aSize = size(all[i]);
-				that.enemies.push(all[i]);
+			if ( indexOf(ignoredTypes, el.tagName.toUpperCase()) == -1 && el.prefix != 'g_vml_' && hasOnlyTextualChildren(el) && el.className != "ASTEROIDSYEAH" ) {
+				el.aSize = size(el);
+				that.enemies.push(el);
 				
-				addClass(all[i], "ASTEROIDSYEAHENEMY");
+				addClass(el, "ASTEROIDSYEAHENEMY");
 				
 				// this is only for enemycounting
-				if ( ! all[i].aAdded ) {
-					all[i].aAdded = true;
+				if ( ! el.aAdded ) {
+					el.aAdded = true;
 					that.totalEnemies++;
 				}
 			}
@@ -462,7 +461,6 @@ function Asteroids() {
 		}
 		return true;
 	};
-	window.hasOnlyTextualChildren = hasOnlyTextualChildren;
 	
 	function indexOf(arr, item, from){
 		if ( arr.indexOf ) return arr.indexOf(item, from);
@@ -521,6 +519,7 @@ function Asteroids() {
 		zIndex = "10000";
 	}
 	
+	// Is IE
 	if ( typeof G_vmlCanvasManager != 'undefined' ) {
 		this.canvas = G_vmlCanvasManager.initElement(this.canvas);
 		if ( ! this.canvas.getContext ) {
@@ -540,8 +539,8 @@ function Asteroids() {
 		w = document.documentElement.clientWidth;
 		h = document.documentElement.clientHeight;
 		
-		self.canvas.setAttribute('width', w);
-		self.canvas.setAttribute('height', h);
+		that.canvas.setAttribute('width', w);
+		that.canvas.setAttribute('height', h);
 	};
 	addEvent(window, 'resize', eventResize);
 	
@@ -555,7 +554,7 @@ function Asteroids() {
 	this.navigation = document.createElement('div');
 	this.navigation.className = "ASTEROIDSYEAH";
 	with ( this.navigation.style ) {
-		font = "Arial,sans-serif";
+		fontFamily = "Arial,sans-serif";
 		position = "fixed";
 		zIndex = "10001";
 		bottom = "10px";
@@ -595,6 +594,15 @@ function Asteroids() {
 	this.debug.innerHTML = "";
 	this.navigation.appendChild(this.debug);
 	
+	// For ie
+	if ( typeof G_vmlCanvasManager != 'undefined' ) {
+		var children = this.canvas.getElementsByTagName('*');
+		for ( var i = 0, c; c = children[i]; i++ )
+			addClass(c, 'ASTEROIDSYEAH');
+	}
+	
+	addClass(this.canvas, 'ASTEROIDSYEAH');
+	
 	/*
 		== Events ==
 	*/
@@ -613,36 +621,40 @@ function Asteroids() {
 		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('B'), code('W'), code('A'), code('S'), code('D')], event.keyCode) != -1 ) {
 			if ( event.preventDefault )
 				event.preventDefault();
+			event.returnValue = false;
 			return false;
 		}
 	};
-	addEvent(window, 'keydown', eventKeydown);
+	addEvent(document, 'keydown', eventKeydown);
 	
 	var eventKeypress = function(event) {
 		event = event || window.event;
 		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('W'), code('A'), code('S'), code('D')], event.keyCode || event.which) != -1 ) {
 			if ( event.preventDefault )
 				event.preventDefault();
+			event.returnValue = false;
 			return false;
 		}
 	};
-	addEvent(window, 'keypress', eventKeypress);
+	addEvent(document, 'keypress', eventKeypress);
 	
 	var eventKeyup = function(event) {
 		event = event || window.event;
 		that.keysPressed[event.keyCode] = false;
 		switch ( event.keyCode ) {
 			case code('B'):
-				removeStylesheet("ASTEROIDSYEAH");
+				if ( ! window.ActiveXObject )
+					removeStylesheet("ASTEROIDSYEAH");
 			break;
 		}
 		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('B'), code('W'), code('A'), code('S'), code('D')], event.keyCode) != -1 ) {
 			if ( event.preventDefault )
 				event.preventDefault();
+			event.returnValue = false;
 			return false;
 		}
 	};
-	addEvent(window, 'keyup', eventKeyup);
+	addEvent(document, 'keyup', eventKeyup);
 	
 	/*
 		Context operations
@@ -964,9 +976,9 @@ function Asteroids() {
 	setTimeout(updateFunc, 1000 / FPS);
 	
 	function destroy() {
-		removeEvent(window, 'keydown', eventKeydown);
-		removeEvent(window, 'keypress', eventKeypress);
-		removeEvent(window, 'keyup', eventKeyup);
+		removeEvent(document, 'keydown', eventKeydown);
+		removeEvent(document, 'keypress', eventKeypress);
+		removeEvent(document, 'keyup', eventKeyup);
 		removeEvent(window, 'resize', eventResize);
 		isRunning = false;
 		removeStylesheet("ASTEROIDSYEAH");
@@ -987,7 +999,7 @@ if ( window.ActiveXObject ) {
 	var script = document.createElement("script");
     script.setAttribute('type', 'text/javascript');
 	script.onreadystatechange = function() {
-		if ( script.readyState == 'loaded' || script.readyState == 'completed' ) {
+		if ( script.readyState == 'loaded' || script.readyState == 'completed' || script.readyState == 'complete' ) {
 			new Asteroids();
 		}
 	};
