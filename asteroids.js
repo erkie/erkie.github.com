@@ -1,5 +1,10 @@
 (function() {
 function Asteroids() {
+	if ( ! window.ASTEROIDS )
+		window.ASTEROIDS = {
+			enemiesKilled: 0
+		};
+	
 	/*
 		Classes
 	*/
@@ -269,7 +274,7 @@ function Asteroids() {
 	var closeURL = "http://asteroids.glonk.se/close.png";*/
 	
 	// points
-	this.enemiesKilled = 0;
+	this.enemiesKilled = parseInt(window.ASTEROIDS.enemiesKilled, 10);
 	
 	// generated every 10 ms
 	this.flame = {r: [], y: []};
@@ -448,6 +453,13 @@ function Asteroids() {
 		}
 	};
 	
+	function setScore() {
+		that.points.innerHTML = that.enemiesKilled * 10;
+		that.points.title = that.enemiesKilled + "/" + that.totalEnemies;
+		
+		window.ASTEROIDS.enemiesKilled = that.enemiesKilled;
+	};
+	
 	function hasOnlyTextualChildren(element) {
 		if ( indexOf(hiddenTypes, element.tagName) != -1 ) return false;
 		if ( element.offsetWidth == 0 && element.offsetHeight == 0 ) return false;
@@ -571,7 +583,7 @@ function Asteroids() {
 	this.points.className = "ASTEROIDSYEAH";
 	this.navigation.appendChild(this.points);
 	
-	this.points.innerHTML = "0";
+	setScore();
 	
 	// highscore link
 	/*this.highscoreLink = document.createElement('a');
@@ -922,8 +934,7 @@ function Asteroids() {
 				enemy.parentNode.removeChild(enemy);
 			} catch ( e ) {}
 			
-			this.points.innerHTML = this.enemiesKilled * 10;
-			this.points.title = this.enemiesKilled + "/" + this.totalEnemies;
+			setScore();
 			
 			arrayRemove(this.dieing, i);
 			i--;
