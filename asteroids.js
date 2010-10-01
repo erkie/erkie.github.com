@@ -629,11 +629,14 @@ function Asteroids() {
 			break;
 		}
 		
-		// check here so we can stop propogation appropriately
+		// check here so we can stop propagation appropriately
 		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('B'), code('W'), code('A'), code('S'), code('D')], event.keyCode) != -1 ) {
 			if ( event.preventDefault )
 				event.preventDefault();
+			if ( event.stopPropagation)
+				event.stopPropagation();
 			event.returnValue = false;
+			event.cancelBubble = true;
 			return false;
 		}
 	};
@@ -644,7 +647,10 @@ function Asteroids() {
 		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('W'), code('A'), code('S'), code('D')], event.keyCode || event.which) != -1 ) {
 			if ( event.preventDefault )
 				event.preventDefault();
+			if ( event.stopPropagation )
+				event.stopPropagation();
 			event.returnValue = false;
+			event.cancelBubble = true;
 			return false;
 		}
 	};
@@ -662,7 +668,10 @@ function Asteroids() {
 		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('B'), code('W'), code('A'), code('S'), code('D')], event.keyCode) != -1 ) {
 			if ( event.preventDefault )
 				event.preventDefault();
+			if ( event.stopPropagation )
+				event.stopPropagation();
 			event.returnValue = false;
+			event.cancelBubble = true;
 			return false;
 		}
 	};
