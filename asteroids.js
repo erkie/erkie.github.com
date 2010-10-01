@@ -260,10 +260,10 @@ function Asteroids() {
 	
 	var timeBetweenFire = 150; // how many milliseconds between shots
 	var timeBetweenBlink = 250; // milliseconds between enemy blink
-	var timeBetweenEnemyUpdate = 400;
+	var timeBetweenEnemyUpdate = isIE ? 10000 : 2000;
 	var bulletRadius = 2;
-	var maxParticles = isIE ? 10 : 40;
-	var maxBullets = isIE ? 10 : 20;
+	var maxParticles = 40;
+	var maxBullets = 20;
 	
 	/*var highscoreURL = "http://asteroids.glonk.se/highscores.html";
 	var closeURL = "http://asteroids.glonk.se/close.png";*/
@@ -999,11 +999,12 @@ if ( window.ActiveXObject ) {
 	var script = document.createElement("script");
     script.setAttribute('type', 'text/javascript');
 	script.onreadystatechange = function() {
-		if ( script.readyState == 'loaded' || script.readyState == 'completed' || script.readyState == 'complete' ) {
-			new Asteroids();
+		if ( script.readyState == 'loaded' || script.readyState == 'complete' ) {
+			if ( typeof G_vmlCanvasManager != "undefined" )
+				new Asteroids();
 		}
 	};
-    script.src = "excanvas.js";    
+    script.src = "http://erkie.github.com/excanvas.js";    
 	document.getElementsByTagName('head')[0].appendChild(script);
 }
 else new Asteroids();
