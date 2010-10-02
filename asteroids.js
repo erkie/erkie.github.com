@@ -557,8 +557,19 @@ function Asteroids() {
 		}
 	}
 	
-	addEvent(this.canvas, 'mousedown', function() {
-		destroy.apply(that);
+	addEvent(this.canvas, 'mousedown', function(e) {
+		e = e || window.event;
+		var message = document.createElement('span');
+		message.style.position = 'absolute';
+		message.style.border = '1px solid #999';
+		message.style.background = 'white';
+		message.innerHTML = 'Press Esc to quit';
+		document.body.appendChild(message);
+		
+		var x = e.pageX || (e.clientX + document.body.scrollLeft);
+		var y = e.pageY || (e.clientX + document.body.scrollTop);
+		message.style.left = x - message.offsetWidth/2 + 'px';
+		message.style.top = y - message.offsetHeight/2 + 'px';
 	});
 	
 	var eventResize = function() {
@@ -587,7 +598,7 @@ function Asteroids() {
 		right = "10px";
 		textAlign = "right";
 	}
-	this.navigation.innerHTML = "(click anywhere to exit/press esc to quit) ";
+	this.navigation.innerHTML = "(press esc to quit) ";
 	document.body.appendChild(this.navigation);
 	
 	// points
