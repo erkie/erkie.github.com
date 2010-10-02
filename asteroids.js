@@ -566,8 +566,8 @@ function Asteroids() {
 		message.innerHTML = 'Press Esc to quit';
 		document.body.appendChild(message);
 		
-		var x = e.pageX || (e.clientX + document.body.scrollLeft);
-		var y = e.pageY || (e.clientX + document.body.scrollTop);
+		var x = e.pageX || (e.clientX + document.documentElement.scrollLeft);
+		var y = e.pageY || (e.clientX + document.documentElement.scrollTop);
 		message.style.left = x - message.offsetWidth/2 + 'px';
 		message.style.top = y - message.offsetHeight/2 + 'px';
 	});
