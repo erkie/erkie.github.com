@@ -251,7 +251,7 @@ function Asteroids() {
 	var playerWidth = 20, playerHeight = 30;
 	var playerVerts = [[-1 * playerWidth / 2, -15], [playerWidth / 2, -15], [0, 15]];
 	
-	var ignoredTypes = ['HTML', 'HEAD', 'BODY', 'SCRIPT', 'TITLE', 'CANVAS', 'META', 'STYLE', 'LINK', 'SHAPE', 'LINE', 'GROUP', 'IMAGE', 'STROKE', 'FILL', 'SKEW', 'PATH', 'TEXTPATH'];
+	var ignoredTypes = ['HTML', 'HEAD', 'BODY', 'SCRIPT', 'TITLE', 'CANVAS', 'META', 'STYLE', 'LINK', 'SHAPE', 'LINE', 'GROUP', 'IMAGE', 'STROKE', 'FILL', 'SKEW', 'PATH', 'TEXTPATH']; // Half of these are for IE g_vml
 	var hiddenTypes = ['BR', 'HR'];
 	
 	var FPS = isIE ? 30 : 50;
@@ -291,7 +291,7 @@ function Asteroids() {
 	this.keysPressed = {};
 	this.firedAt = false;
 	this.updated = {
-		enemies: new Date().getTime(), // the time before the enemyIndex was last updated
+		enemies: false, // if the enemy index has been updated since the user pressed B for Blink
 		flame: new Date().getTime(), // the time the flame was last updated
 		blink: {time: 0, isActive: false}
 	};
@@ -316,7 +316,7 @@ function Asteroids() {
 		that.enemies = [];
 		for ( var i = 0, el; el = all[i]; i++ ) {
 			// elements with className ASTEROIDSYEAH are part of the "game"
-			if ( indexOf(ignoredTypes, el.tagName.toUpperCase()) == -1 && el.prefix != 'g_vml_' && hasOnlyTextualChildren(el) && el.className != "ASTEROIDSYEAH" ) {
+			if ( indexOf(ignoredTypes, el.tagName.toUpperCase()) == -1 && el.prefix != 'g_vml_' && hasOnlyTextualChildren(el) && el.className != "ASTEROIDSYEAH" && el.offsetHeight > 0 ) {
 				el.aSize = size(el);
 				that.enemies.push(el);
 				
@@ -438,6 +438,20 @@ function Asteroids() {
 		var rest = array.slice((to || from) + 1 || array.length);
 		array.length = from < 0 ? array.length + from : from;
 		return array.push.apply(array, rest);
+	};
+	
+	function getElementFromPoint(x, y) {
+		// hide canvas so it isn't picked up
+		that.canvas.style.visibility = "hidden";
+		that.navigation.style.visibility = "hidden";
+		var element = document.elementFromPoint(x, y);
+		if ( ! element ) return false;
+		if ( element.nodeType == 3 )
+			element = element.parentNode;
+		// show the canvas again, hopefully it didn't blink
+		that.canvas.style.visibility = "visible";
+		that.navigation.style.visibility = "visible";
+		return element;
 	};
 	
 	function addParticles(startPos) {
@@ -775,7 +789,6 @@ function Asteroids() {
 	
 	var isRunning = true;
 	var lastUpdate = new Date().getTime();
-	var hasKilled = false;
 	
 	this.update = function() {
 		var forceChange = false;
@@ -786,13 +799,6 @@ function Asteroids() {
 		var nowTime = new Date().getTime();
 		var tDelta = (nowTime - lastUpdate) / 1000;
 		lastUpdate = nowTime;
-		
-		// check enemy index timer and update that if needed
-		if ( nowTime - this.updated.enemies > timeBetweenEnemyUpdate && hasKilled ) {
-			updateEnemyIndex();
-			this.updated.enemies = nowTime;
-			hasKilled = false;
-		}
 		
 		// update flame and timer if needed
 		var drawFlame = false;
@@ -845,6 +851,11 @@ function Asteroids() {
 		
 		// add blink
 		if ( this.keysPressed[code('B')] ) {
+			if ( ! this.updated.enemies ) {
+				updateEnemyIndex();
+				this.updated.enemies = true;
+			}
+			
 			forceChange = true;
 			
 			this.updated.blink.time += tDelta * 1000;
@@ -858,6 +869,8 @@ function Asteroids() {
 				}
 				this.updated.blink.time = 0;
 			}
+		} else {
+			this.updated.enemies = false;
 		}
 		
 		if ( this.keysPressed[code('esc')] ) {
@@ -909,26 +922,16 @@ function Asteroids() {
 			boundsCheck(this.bullets[i].pos);
 			
 			// check collisions
-			var didKill = false;
-			for ( var x = 0, enemy; enemy = this.enemies[x]; x++ ) {
-				if ( ray.intersectsWithRect(enemy.aSize) ) {
-					hasKilled = true;
-					
-					// move to dieing
-					this.dieing.push(enemy);
-					arrayRemove(this.enemies, x);
-					
-					// the shot was a kill
-					didKill = true;
-					
-					// create particles at position
-					addParticles(this.bullets[i].pos);
-					break;
-				}
-			}
+			var murdered = getElementFromPoint(this.bullets[i].pos.x, this.bullets[i].pos.y);
+			if (
+				murdered &&
+				indexOf(ignoredTypes, murdered.tagName.toUpperCase()) == -1 &&
+				hasOnlyTextualChildren(murdered) && murdered.className != "ASTEROIDSYEAH"
+			) {
+				didKill = true;
+				addParticles(this.bullets[i].pos);
+				this.dieing.push(murdered);
 			
-			// If it hit something the bullet should go down with it
-			if ( didKill ) {
 				arrayRemove(this.bullets, i);
 				i--;
 				continue;
