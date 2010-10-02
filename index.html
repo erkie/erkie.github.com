@@ -29,6 +29,17 @@
 			.ASTEROIDSYEAH #doit {
 				opacity: 0.5;
 			}
+			
+			#donate {
+				position: absolute;
+				top: 10px;
+				right: 10px;
+				font-size: 80%;
+				text-align: right;
+				width: 300px;
+			}
+			
+				#donate p { margin: 0 0 5px 0;  float: left;}
 		</style>
 	</head>
 
@@ -36,7 +47,19 @@
 		<div id="wrapper">
 			<h1>Bored?</h1>
 		
-			<p><a id="doit" href="javascript:var%20s%20=%20document.createElement('script');s.type='text/javascript';document.body.appendChild(s);s.src='http://erkie.github.com/asteroids.min.js';void(0);" title="Click or drag me to your bookmarks bar and click on your webpage of choice">Kick ass</a>
+			<div id="donate">
+				<p>Buy me a coffee and a server for highscores!</p>
+				<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+					<input type="hidden" name="cmd" value="_s-xclick">
+					<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----
+					">
+					<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+					<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+				</form>
+			</div>
+
+					
+			<p><a id="doit" href="javascript:var%20s%20=%20document.createElement('script');s.type='text/javascript';document.body.appendChild(s);s.src='http://erkie.github.com/asteroids.min.js';void(0);" title="Kick ass">Kick ass</a>
 			</p>
 			
 			<p><a href="javascript:var%20s%20=%20document.createElement('script');s.type='text/javascript';document.body.appendChild(s);s.src='http://erkie.github.com/asteroids.min.js';void(0);">Drag this bookmarklet to your bookmarks bar or a tab and start having some fun on other pages too!</a></p>
@@ -57,7 +80,12 @@
 
 			<p style="clear: both;"><strong>Remember</strong>: It's cooler if you make your own sound effects.</p>
 			
-			<p><small>Feel free to do whatever you want with it. But remember you saw it first here!<br />If you feel like contacting me: <a href="mailto:erik.rothoff@gmail.com">erik.rothoff@gmail.com</a> or you can go to the <a href="http://github.com/erkie/erkie.github.com">github page.</a></small></p>
+			<p><small>Feel free to do whatever you want with it. But remember you saw it first here!</p>
+			
+			<h2>Who am I</h2>
+			
+			<p>My name is Erik Rothoff Andersson (most of the time I'm Erik Andersson, but it is such a common name in Sweden that the email adress erik.andersson@gmail.com was taken before I get could it). I am 17 years of age (going on 18 in a couple of days) and currently live and study in Sweden.</p>
+			<p>If you feel like contacting me: <a href="mailto:erik.rothoff@gmail.com">erik.rothoff@gmail.com</a> or you can go to the <a href="http://github.com/erkie/erkie.github.com">github page.</a></small></p>
 			
 			<script type="text/javascript">
 				var _gaq = _gaq || [];
