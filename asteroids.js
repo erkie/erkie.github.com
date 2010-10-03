@@ -915,8 +915,6 @@ function Asteroids() {
 			}
 			
 			var bulletVel = this.bullets[i].dir.setLengthNew(bulletSpeed * tDelta).add(this.bullets[i].startVel.mulNew(tDelta));
-			var ray = new Line(this.bullets[i].pos.cp(), this.bullets[i].pos.addNew(bulletVel));
-			ray.shift(this.scrollPos);
 			
 			this.bullets[i].pos.add(bulletVel);
 			boundsCheck(this.bullets[i].pos);
