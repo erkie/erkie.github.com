@@ -943,15 +943,17 @@ function Asteroids() {
 			}
 		}
 		
-		for ( var i = this.dying.length - 1; i >= 0; i-- ) {
-		    try {
-		        this.dying[i].parentNode.removeChild(this.dying[i]);
-		    } catch ( e ) {}
+		if (this.dying.length) {
+    		for ( var i = this.dying.length - 1; i >= 0; i-- ) {
+    		    try {
+    		        this.dying[i].parentNode.removeChild(this.dying[i]);
+    		    } catch ( e ) {}
+    		}
+
+    		this.enemiesKilled += this.dying.length;
+    	    setScore();
+    		this.dying = [];
 		}
-		
-		this.enemiesKilled += this.dying.length;
-	    setScore();
-		this.dying = [];
 
 		// update particles position
 		for ( var i = this.particles.length - 1; i >= 0; i-- ) {
