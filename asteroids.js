@@ -300,9 +300,9 @@ function Asteroids() {
 	
 	this.bullets = [];
 	
-	// Enemies lay first in this.enemies, when they are shot they are moved to this.dieing
+	// Enemies lay first in this.enemies, when they are shot they are moved to this.dying
 	this.enemies = [];
-	this.dieing = [];
+	this.dying = [];
 	this.totalEnemies = 0;
 	
 	// Particles are created when something is shot
@@ -931,7 +931,7 @@ function Asteroids() {
 			) {
 				didKill = true;
 				addParticles(this.bullets[i].pos);
-				this.dieing.push(murdered);
+				this.dying.push(murdered);
 			
 				arrayRemove(this.bullets, i);
 				i--;
@@ -939,20 +939,16 @@ function Asteroids() {
 			}
 		}
 		
-		// Remove all dieing elements
-		for ( var i = 0, enemy; enemy = this.dieing[i]; i++ ) {
-			this.enemiesKilled++;
-			
-			try {
-				enemy.parentNode.removeChild(enemy);
-			} catch ( e ) {}
-			
-			setScore();
-			
-			arrayRemove(this.dieing, i);
-			i--;
+		for ( var i = this.dying.length - 1; i >= 0; i-- ) {
+		    try {
+		        this.dying[i].parentNode.removeChild(this.dying[i]);
+		    } catch ( e ) {}
 		}
 		
+		this.enemiesKilled += this.dying.length;
+	    setScore();
+		this.dying = [];
+
 		// update particles position
 		for ( var i = 0; i < this.particles.length; i++ ) {
 			this.particles[i].pos.add(this.particles[i].dir.mulNew(particleSpeed * tDelta * Math.random()));
