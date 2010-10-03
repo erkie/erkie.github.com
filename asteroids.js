@@ -249,7 +249,8 @@ function Asteroids() {
 	// configuration directives are placed in local variables
 	var w = document.documentElement.clientWidth, h = document.documentElement.clientHeight;
 	var playerWidth = 20, playerHeight = 30;
-	var playerVerts = [[-1 * playerWidth / 2, -15], [playerWidth / 2, -15], [0, 15]];
+	
+	var playerVerts = [[-15,-10], [-15,10], [15,0]];
 	
 	var ignoredTypes = ['HTML', 'HEAD', 'BODY', 'SCRIPT', 'TITLE', 'CANVAS', 'META', 'STYLE', 'LINK', 'SHAPE', 'LINE', 'GROUP', 'IMAGE', 'STROKE', 'FILL', 'SKEW', 'PATH', 'TEXTPATH']; // Half of these are for IE g_vml
 	var hiddenTypes = ['BR', 'HR'];
@@ -332,36 +333,36 @@ function Asteroids() {
 	};
 	updateEnemyIndex();
 	
-	function createFlames() {
-		// Firstly create red flames
-		that.flame.r = [[0, 0]];
-		that.flame.y = [[0, 0]];
-		
-		var rWidth = playerWidth;
-		var rIncrease = playerWidth * 0.1;
-		for ( var x = 0; x < rWidth; x += rIncrease ) 
-			that.flame.r.push([x, -random(2, 7)]);
-		that.flame.r.push([rWidth, 0]);
-		
-		// yellow flames
-		var yWidth = playerWidth * 0.6;
-		var yIncrease = yWidth * 0.2;
-		for ( var x = 0; x < yWidth; x += yIncrease )
-			that.flame.y.push([x, -random(1, 4)]);
-		that.flame.y.push([yWidth, 0]);
-		
-		// Center 'em
-		var halfR = rWidth / 2, halfY = yWidth / 2;
-		for ( var i = 0; i < that.flame.r.length; i++ ) {
-			that.flame.r[i][0] -= halfR;
-			that.flame.r[i][1] -= playerHeight / 2;
-		}
-		
-		for ( var i = 0; i < that.flame.y.length; i++ ) {
-			that.flame.y[i][0] -= halfY;
-			that.flame.y[i][1] -= playerHeight / 2;
-		}
-	};
+	var createFlames;
+	
+	(function () {
+    	var rWidth = playerWidth,
+    	    rIncrease = playerWidth * 0.1,
+    	    yWidth = playerWidth * 0.6,
+    	    yIncrease = yWidth * 0.2,
+    	    halfR = rWidth / 2,
+    	    halfY = yWidth / 2,
+    	    halfPlayerHeight = playerHeight / 2;
+
+    	createFlames = function () {
+    		// Firstly create red flames
+    		that.flame.r = [[-1 * halfPlayerHeight, -1 * halfR]];
+    		that.flame.y = [[-1 * halfPlayerHeight, -1 * halfY]];
+
+    		for ( var x = 0; x < rWidth; x += rIncrease ) {
+    			that.flame.r.push([-random(2, 7) - halfPlayerHeight, x - halfR]);
+    		}
+    		
+    		that.flame.r.push([-1 * halfPlayerHeight, halfR]);
+
+    		for ( var x = 0; x < yWidth; x += yIncrease ) {
+    			that.flame.y.push([-random(2, 7) - halfPlayerHeight, x - halfY]);
+    		}
+    		
+    		that.flame.y.push([-1 * halfPlayerHeight, halfY]);
+    	};
+	})();
+	
 	createFlames();
 	
 	/*
@@ -734,7 +735,7 @@ function Asteroids() {
 	this.ctx.drawPlayer = function() {
 		this.save();
 		this.translate(that.pos.x, that.pos.y);
-		this.rotate(-that.dir.angle());
+        this.rotate(that.dir.angle());
 		this.tracePoly(playerVerts);
 		this.fillStyle = "white";
 		this.fill();
@@ -765,7 +766,7 @@ function Asteroids() {
 		this.save();
 		
 		this.translate(that.pos.x, that.pos.y);
-		this.rotate(-that.dir.angle());
+        this.rotate(that.dir.angle());
 		
 		var oldColor = this.strokeStyle;
 		this.strokeStyle = "red";
