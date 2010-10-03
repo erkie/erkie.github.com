@@ -454,7 +454,13 @@ function Asteroids() {
 		that.canvas.style.visibility = "hidden";
 		that.navigation.style.visibility = "hidden";
 		var element = document.elementFromPoint(x, y);
-		if ( ! element ) return false;
+
+		if ( ! element ) {
+    		that.canvas.style.visibility = 'visible';
+    		that.navigation.style.visibility = 'visible';
+		    return false;
+		}
+
 		if ( element.nodeType == 3 )
 			element = element.parentNode;
 		// show the canvas again, hopefully it didn't blink
