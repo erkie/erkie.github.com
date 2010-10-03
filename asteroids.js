@@ -451,21 +451,21 @@ function Asteroids() {
 	
 	function getElementFromPoint(x, y) {
 		// hide canvas so it isn't picked up
-		that.canvas.style.visibility = "hidden";
-		that.navigation.style.visibility = "hidden";
+		that.gameContainer.style.visibility = 'hidden';
+
 		var element = document.elementFromPoint(x, y);
 
 		if ( ! element ) {
-    		that.canvas.style.visibility = 'visible';
-    		that.navigation.style.visibility = 'visible';
+    		that.gameContainer.style.visibility = 'visible';
 		    return false;
 		}
 
-		if ( element.nodeType == 3 )
+		if ( element.nodeType == 3 ) {
 			element = element.parentNode;
+		}
+
 		// show the canvas again, hopefully it didn't blink
-		that.canvas.style.visibility = "visible";
-		that.navigation.style.visibility = "visible";
+		that.gameContainer.style.visibility = 'visible';
 		return element;
 	};
 	
@@ -545,10 +545,13 @@ function Asteroids() {
 	/*
 		== Setup ==
 	*/
+	this.gameContainer = document.createElement('div');
+	this.gameContainer.className = 'ASTEROIDSYEAH';
 	
 	this.canvas = document.createElement('canvas');
 	this.canvas.setAttribute('width', w);
 	this.canvas.setAttribute('height', h);
+	this.canvas.className = 'ASTEROIDSYEAH';
 	with ( this.canvas.style ) {
 		width = w + "px";
 		height = h + "px";
@@ -585,7 +588,7 @@ function Asteroids() {
 	};
 	addEvent(window, 'resize', eventResize);
 	
-	document.body.appendChild(this.canvas);
+	this.gameContainer.appendChild(this.canvas);
 	this.ctx = this.canvas.getContext("2d");
 	
 	this.ctx.fillStyle = "black";
@@ -603,7 +606,7 @@ function Asteroids() {
 		textAlign = "right";
 	}
 	this.navigation.innerHTML = "(click anywhere to exit/press esc to quit) ";
-	document.body.appendChild(this.navigation);
+	this.gameContainer.appendChild(this.navigation);
 	
 	// points
 	this.points = document.createElement('span');
@@ -635,14 +638,14 @@ function Asteroids() {
 	this.debug.innerHTML = "";
 	this.navigation.appendChild(this.debug);
 	
+	document.body.appendChild(this.gameContainer);
+
 	// For ie
 	if ( typeof G_vmlCanvasManager != 'undefined' ) {
 		var children = this.canvas.getElementsByTagName('*');
 		for ( var i = 0, c; c = children[i]; i++ )
 			addClass(c, 'ASTEROIDSYEAH');
 	}
-	
-	addClass(this.canvas, 'ASTEROIDSYEAH');
 	
 	/*
 		== Events ==
@@ -1013,8 +1016,7 @@ function Asteroids() {
 		isRunning = false;
 		removeStylesheet("ASTEROIDSYEAH");
 		removeClass(document.body, 'ASTEROIDSYEAH');
-		this.canvas.parentNode.removeChild(this.canvas);
-		this.navigation.parentNode.removeChild(this.navigation);
+		this.gameContainer.parentNode.removeChild(this.gameContainer);
 	};
 }
 
