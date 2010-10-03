@@ -744,21 +744,29 @@ function Asteroids() {
 		this.restore();
 	};
 	
-	this.ctx.drawBullet = function(pos) {
-		this.beginPath();
-		this.arc(pos.x, pos.y, bulletRadius, 0, Math.PI*2, true);
-		this.closePath();
-		this.fill();
+	var PI_SQ = Math.PI*2;
+	
+	this.ctx.drawBullets = function(bullets) {
+		for ( var i = 0; i < bullets.length; i++ ) {
+    		this.beginPath();
+    		this.arc(bullets[i].pos.x, bullets[i].pos.y, bulletRadius, 0, PI_SQ, true);
+    		this.closePath();
+    		this.fill();
+		}
 	};
 	
 	var randomParticleColor = function() {
 		return (['red', 'yellow'])[random(0, 1)];
 	};
 	
-	this.ctx.drawParticle = function(particle) {
+	this.ctx.drawParticles = function(particles) {
 		var oldColor = this.strokeStyle;
-		this.strokeStyle = randomParticleColor();
-		this.drawLine(particle.pos.x, particle.pos.y, particle.pos.x - particle.dir.x * 10, particle.pos.y - particle.dir.y * 10);
+		
+		for ( var i = 0; i < particles.length; i++ ) {
+    		this.strokeStyle = randomParticleColor();
+    		this.drawLine(particles[i].pos.x, particles[i].pos.y, particles[i].pos.x - particles[i].dir.x * 10, particles[i].pos.y - particles[i].dir.y * 10);
+		}
+		
 		this.strokeStyle = oldColor;
 	};
 	
@@ -972,12 +980,14 @@ function Asteroids() {
 				this.ctx.drawFlames(that.flame);
 			
 			// draw bullets
-			for ( var i = 0; i < this.bullets.length; i++ )
-				this.ctx.drawBullet(this.bullets[i].pos);
+			if (this.bullets.length) {
+    			this.ctx.drawBullets(this.bullets);
+			}
 			
 			// draw particles
-			for ( var i = 0; i < this.particles.length; i++ )
-				this.ctx.drawParticle(this.particles[i]);
+			if (this.particles.length) {
+    			this.ctx.drawParticles(this.particles);
+    		}
 		}
 		this.lastPos = this.pos;
 		
