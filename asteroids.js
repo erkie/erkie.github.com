@@ -281,9 +281,17 @@ function Asteroids() {
 	this.flame = {r: [], y: []};
 	
 	// blink style
-	function addBlinkStyle() {
-		addStylesheet("ASTEROIDSYEAH", ".ASTEROIDSYEAHENEMY { outline: 2px dotted red; }");
+	this.toggleBlinkStyle = function () {
+	    if (this.updated.blink.isActive) {
+	        removeClass(document.body, 'ASTEROIDSBLINK');
+	    } else {
+	        addClass(document.body, 'ASTEROIDSBLINK');
+	    }
+
+	    this.updated.blink.isActive = !this.updated.blink.isActive;
 	};
+
+	addStylesheet("ASTEROIDSYEAH", ".ASTEROIDSBLINK .ASTEROIDSYEAHENEMY { outline: 2px dotted red; }");
 	
 	this.pos = new Vector(100, 100);
 	this.lastPos = false;
@@ -674,12 +682,7 @@ function Asteroids() {
 	var eventKeyup = function(event) {
 		event = event || window.event;
 		that.keysPressed[event.keyCode] = false;
-		switch ( event.keyCode ) {
-			case code('B'):
-				if ( ! window.ActiveXObject )
-					removeStylesheet("ASTEROIDSYEAH");
-			break;
-		}
+
 		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('B'), code('W'), code('A'), code('S'), code('D')], event.keyCode) != -1 ) {
 			if ( event.preventDefault )
 				event.preventDefault();
@@ -869,13 +872,7 @@ function Asteroids() {
 			
 			this.updated.blink.time += tDelta * 1000;
 			if ( this.updated.blink.time > timeBetweenBlink ) {
-				if ( this.updated.blink.isActive ) {
-					removeStylesheet("ASTEROIDSYEAH");
-					this.updated.blink.isActive = false;
-				} else {
-					addBlinkStyle();
-					this.updated.blink.isActive = true;
-				}
+			    this.toggleBlinkStyle();
 				this.updated.blink.time = 0;
 			}
 		} else {
