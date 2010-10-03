@@ -836,7 +836,7 @@ function Asteroids() {
 		
 		// fire
 		if ( this.keysPressed[code(' ')] && nowTime - this.firedAt > timeBetweenFire ) {
-			this.bullets.push({
+			this.bullets.unshift({
 				'dir': this.dir.cp(),
 				'pos': this.pos.cp(),
 				'startVel': this.vel.cp(),
@@ -846,7 +846,7 @@ function Asteroids() {
 			this.firedAt = nowTime;
 			
 			if ( this.bullets.length > maxBullets ) {
-				arrayRemove(this.bullets, 0);
+			    this.bullets.pop();
 			}
 		}
 		
@@ -906,11 +906,10 @@ function Asteroids() {
 		}
 		
 		// update positions of bullets
-		for ( var i = 0; i < this.bullets.length; i++ ) {
+		for ( var i = this.bullets.length - 1; i >= 0; i-- ) {
 			// bullets should only live for 2 seconds
 			if ( nowTime - this.bullets[i].cameAlive > 2000 ) {
-				arrayRemove(this.bullets, i);
-				i--;
+			    this.bullets.splice(i, 1);
 				forceChange = true;
 				continue;
 			}
@@ -933,8 +932,7 @@ function Asteroids() {
 				addParticles(this.bullets[i].pos);
 				this.dying.push(murdered);
 			
-				arrayRemove(this.bullets, i);
-				i--;
+			    this.bullets.splice(i, 1);
 				continue;
 			}
 		}
@@ -950,12 +948,11 @@ function Asteroids() {
 		this.dying = [];
 
 		// update particles position
-		for ( var i = 0; i < this.particles.length; i++ ) {
+		for ( var i = this.particles.length - 1; i >= 0; i-- ) {
 			this.particles[i].pos.add(this.particles[i].dir.mulNew(particleSpeed * tDelta * Math.random()));
 			
 			if ( nowTime - this.particles[i].cameAlive > 1000 ) {
-				arrayRemove(this.particles, i);
-				i--;
+			    this.particles.splice(i, 1);
 				forceChange = true;
 				continue;
 			}
