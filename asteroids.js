@@ -255,7 +255,7 @@ function Asteroids() {
 	var ignoredTypes = ['HTML', 'HEAD', 'BODY', 'SCRIPT', 'TITLE', 'CANVAS', 'META', 'STYLE', 'LINK', 'SHAPE', 'LINE', 'GROUP', 'IMAGE', 'STROKE', 'FILL', 'SKEW', 'PATH', 'TEXTPATH']; // Half of these are for IE g_vml
 	var hiddenTypes = ['BR', 'HR'];
 	
-	var FPS = isIE ? 30 : 50;
+	var FPS = 50;
 	
 	// units/second
 	var acc			  = 300;
@@ -268,8 +268,8 @@ function Asteroids() {
 	var timeBetweenBlink = 250; // milliseconds between enemy blink
 	var timeBetweenEnemyUpdate = isIE ? 10000 : 2000;
 	var bulletRadius = 2;
-	var maxParticles = 40;
-	var maxBullets = 20;
+	var maxParticles = isIE ? 20 : 40;
+	var maxBullets = isIE ? 10 : 20;
 	
 	/*var highscoreURL = "http://asteroids.glonk.se/highscores.html";
 	var closeURL = "http://asteroids.glonk.se/close.png";*/
@@ -288,7 +288,7 @@ function Asteroids() {
 		this.updated.blink.isActive = !this.updated.blink.isActive;
 	};
 
-	addStylesheet("ASTEROIDSYEAH", ".ASTEROIDSBLINK .ASTEROIDSYEAHENEMY { outline: 2px dotted red; }");
+	addStylesheet(".ASTEROIDSBLINK .ASTEROIDSYEAHENEMY", "outline: 2px dotted red;");
 	
 	this.pos = new Vector(100, 100);
 	this.lastPos = false;
@@ -523,16 +523,17 @@ function Asteroids() {
 		element.className = element.className.replace(new RegExp('(^|\\s)' + className + '(?:\\s|$)'), '$1');
 	};
 	
-	function addStylesheet(name, rules) {
-		var stylesheet = document.getElementById(name);
-		if ( ! stylesheet ) {
-			var stylesheet = document.createElement('style');
-			stylesheet.type = 'text/css';
-			stylesheet.rel = 'stylesheet';
-			stylesheet.id = name;
-			document.getElementsByTagName("head")[0].appendChild(stylesheet);
+	function addStylesheet(selector, rules) {
+		var stylesheet = document.createElement('style');
+		stylesheet.type = 'text/css';
+		stylesheet.rel = 'stylesheet';
+		stylesheet.id = 'ASTEROIDSYEAHSTYLES';
+		try {
+			stylesheet.innerHTML = selector + "{" + rules + "}";
+		} catch ( e ) {
+			stylesheet.styleSheet.addRule(selector, rules);
 		}
-		stylesheet.innerHTML += rules;
+		document.getElementsByTagName("head")[0].appendChild(stylesheet);
 	};
 	
 	function removeStylesheet(name) {
@@ -582,11 +583,12 @@ function Asteroids() {
 		message.style.position = 'absolute';
 		message.style.border = '1px solid #999';
 		message.style.background = 'white';
+		message.style.color = "black";
 		message.innerHTML = 'Press Esc to quit';
 		document.body.appendChild(message);
 		
 		var x = e.pageX || (e.clientX + document.documentElement.scrollLeft);
-		var y = e.pageY || (e.clientX + document.documentElement.scrollTop);
+		var y = e.pageY || (e.clientY + document.documentElement.scrollTop);
 		message.style.left = x - message.offsetWidth/2 + 'px';
 		message.style.top = y - message.offsetHeight/2 + 'px';
 	});
@@ -730,22 +732,9 @@ function Asteroids() {
 		this.beginPath();
 		this.moveTo(xFrom, yFrom);
 		this.lineTo(xTo, yTo);
+		this.lineTo(xTo + 1, yTo + 1);
 		this.closePath();
-		this.stroke();
-	};
-	
-	this.ctx.drawRect = function(rect) {
-		var old = this.strokeStyle;
-		this.strokeStyle = "red";
-		this.strokeRect(rect.x, rect.y, rect.width, rect.height);
-		this.strokeStyle = old;
-	};
-	
-	this.ctx.drawLineFromLine = function(line) {
-		var oldC = this.strokeStyle;
-		this.strokeStyle = "green";
-		this.drawLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y);
-		this.strokeStyle = oldC;
+		this.fill();
 	};
 	
 	this.ctx.tracePoly = function(verts) {
@@ -784,14 +773,14 @@ function Asteroids() {
 	};
 	
 	this.ctx.drawParticles = function(particles) {
-		var oldColor = this.strokeStyle;
+		var oldColor = this.fillStyle;
 		
 		for ( var i = 0; i < particles.length; i++ ) {
-			this.strokeStyle = randomParticleColor();
+			this.fillStyle = randomParticleColor();
 			this.drawLine(particles[i].pos.x, particles[i].pos.y, particles[i].pos.x - particles[i].dir.x * 10, particles[i].pos.y - particles[i].dir.y * 10);
 		}
 		
-		this.strokeStyle = oldColor;
+		this.fillStyle = oldColor;
 	};
 	
 	this.ctx.drawFlames = function(flame) {
@@ -948,7 +937,7 @@ function Asteroids() {
 			// check collisions
 			var murdered = getElementFromPoint(this.bullets[i].pos.x, this.bullets[i].pos.y);
 			if (
-				murdered &&
+				murdered && murdered.tagName &&
 				indexOf(ignoredTypes, murdered.tagName.toUpperCase()) == -1 &&
 				hasOnlyTextualChildren(murdered) && murdered.className != "ASTEROIDSYEAH"
 			) {
@@ -1029,7 +1018,7 @@ function Asteroids() {
 		removeEvent(document, 'keyup', eventKeyup);
 		removeEvent(window, 'resize', eventResize);
 		isRunning = false;
-		removeStylesheet("ASTEROIDSYEAH");
+		removeStylesheet("ASTEROIDSYEAHSTYLES");
 		removeClass(document.body, 'ASTEROIDSYEAH');
 		this.gameContainer.parentNode.removeChild(this.gameContainer);
 	};
