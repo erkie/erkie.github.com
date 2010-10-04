@@ -103,7 +103,7 @@ function Asteroids() {
 		},
 		
 		angle: function() {
-			return Math.atan2(this.x, this.y);
+			return Math.atan2(this.y, this.x);
 		},
 		
 		collidesWith: function(rect) {
@@ -160,9 +160,9 @@ function Asteroids() {
 			var v3 = line2.p1, v4 = line2.p2;
 			
 			var denom = ((v4.y - v3.y) * (v2.x - v1.x)) - ((v4.x - v3.x) * (v2.y - v1.y));
-		    var numerator = ((v4.x - v3.x) * (v1.y - v3.y)) - ((v4.y - v3.y) * (v1.x - v3.x));
+			var numerator = ((v4.x - v3.x) * (v1.y - v3.y)) - ((v4.y - v3.y) * (v1.x - v3.x));
 		
-		    var numerator2 = ((v2.x - v1.x) * (v1.y - v3.y)) - ((v2.y - v1.y) * (v1.x - v3.x));
+			var numerator2 = ((v2.x - v1.x) * (v1.y - v3.y)) - ((v2.y - v1.y) * (v1.x - v3.x));
 			
 			if ( denom == 0.0 ) {
 				return false;
@@ -249,7 +249,8 @@ function Asteroids() {
 	// configuration directives are placed in local variables
 	var w = document.documentElement.clientWidth, h = document.documentElement.clientHeight;
 	var playerWidth = 20, playerHeight = 30;
-	var playerVerts = [[-1 * playerWidth / 2, -15], [playerWidth / 2, -15], [0, 15]];
+	
+	var playerVerts = [[-1 * playerHeight/2, -1 * playerWidth/2], [-1 * playerHeight/2, playerWidth/2], [playerHeight/2, 0]];
 	
 	var ignoredTypes = ['HTML', 'HEAD', 'BODY', 'SCRIPT', 'TITLE', 'CANVAS', 'META', 'STYLE', 'LINK', 'SHAPE', 'LINE', 'GROUP', 'IMAGE', 'STROKE', 'FILL', 'SKEW', 'PATH', 'TEXTPATH']; // Half of these are for IE g_vml
 	var hiddenTypes = ['BR', 'HR'];
@@ -257,10 +258,10 @@ function Asteroids() {
 	var FPS = isIE ? 30 : 50;
 	
 	// units/second
-	var acc           = 300;
-	var maxSpeed      = 600;
-	var rotSpeed      = 360; // one rotation per second
-	var bulletSpeed   = 700;
+	var acc			  = 300;
+	var maxSpeed	  = 600;
+	var rotSpeed	  = 360; // one rotation per second
+	var bulletSpeed	  = 700;
 	var particleSpeed = 400;
 	
 	var timeBetweenFire = 150; // how many milliseconds between shots
@@ -277,9 +278,17 @@ function Asteroids() {
 	this.flame = {r: [], y: []};
 	
 	// blink style
-	function addBlinkStyle() {
-		addStylesheet("ASTEROIDSYEAH", ".ASTEROIDSYEAHENEMY { outline: 2px dotted red; }");
+	this.toggleBlinkStyle = function () {
+		if (this.updated.blink.isActive) {
+			removeClass(document.body, 'ASTEROIDSBLINK');
+		} else {
+			addClass(document.body, 'ASTEROIDSBLINK');
+		}
+
+		this.updated.blink.isActive = !this.updated.blink.isActive;
 	};
+
+	addStylesheet("ASTEROIDSYEAH", ".ASTEROIDSBLINK .ASTEROIDSYEAHENEMY { outline: 2px dotted red; }");
 	
 	this.pos = new Vector(100, 100);
 	this.lastPos = false;
@@ -296,9 +305,9 @@ function Asteroids() {
 	
 	this.bullets = [];
 	
-	// Enemies lay first in this.enemies, when they are shot they are moved to this.dieing
+	// Enemies lay first in this.enemies, when they are shot they are moved to this.dying
 	this.enemies = [];
-	this.dieing = [];
+	this.dying = [];
 	this.totalEnemies = 0;
 	
 	// Particles are created when something is shot
@@ -329,36 +338,37 @@ function Asteroids() {
 	};
 	updateEnemyIndex();
 	
-	function createFlames() {
-		// Firstly create red flames
-		that.flame.r = [[0, 0]];
-		that.flame.y = [[0, 0]];
-		
-		var rWidth = playerWidth;
-		var rIncrease = playerWidth * 0.1;
-		for ( var x = 0; x < rWidth; x += rIncrease ) 
-			that.flame.r.push([x, -random(2, 7)]);
-		that.flame.r.push([rWidth, 0]);
-		
-		// yellow flames
-		var yWidth = playerWidth * 0.6;
-		var yIncrease = yWidth * 0.2;
-		for ( var x = 0; x < yWidth; x += yIncrease )
-			that.flame.y.push([x, -random(1, 4)]);
-		that.flame.y.push([yWidth, 0]);
-		
-		// Center 'em
-		var halfR = rWidth / 2, halfY = yWidth / 2;
-		for ( var i = 0; i < that.flame.r.length; i++ ) {
-			that.flame.r[i][0] -= halfR;
-			that.flame.r[i][1] -= playerHeight / 2;
-		}
-		
-		for ( var i = 0; i < that.flame.y.length; i++ ) {
-			that.flame.y[i][0] -= halfY;
-			that.flame.y[i][1] -= playerHeight / 2;
-		}
-	};
+	// createFlames create the vectors for the flames of the ship
+	var createFlames;
+	(function () {
+		var rWidth = playerWidth,
+			rIncrease = playerWidth * 0.1,
+			yWidth = playerWidth * 0.6,
+			yIncrease = yWidth * 0.2,
+			halfR = rWidth / 2,
+			halfY = yWidth / 2,
+			halfPlayerHeight = playerHeight / 2;
+
+		createFlames = function () {
+			// Firstly create red flames
+			that.flame.r = [[-1 * halfPlayerHeight, -1 * halfR]];
+			that.flame.y = [[-1 * halfPlayerHeight, -1 * halfY]];
+
+			for ( var x = 0; x < rWidth; x += rIncrease ) {
+				that.flame.r.push([-random(2, 7) - halfPlayerHeight, x - halfR]);
+			}
+
+			that.flame.r.push([-1 * halfPlayerHeight, halfR]);
+			
+			// ... And now the yellow flames
+			for ( var x = 0; x < yWidth; x += yIncrease ) {
+				that.flame.y.push([-random(2, 7) - halfPlayerHeight, x - halfY]);
+			}
+
+			that.flame.y.push([-1 * halfPlayerHeight, halfY]);
+		};
+	})();
+	
 	createFlames();
 	
 	/*
@@ -439,21 +449,24 @@ function Asteroids() {
 	
 	function applyVisibility(vis) {
 		for ( var i = 0, p; p = window.ASTEROIDSPLAYERS[i]; i++ ) {
-			p.canvas.style.visibility = vis;
-			p.navigation.style.visibility = vis;
+			p.gameContainer.style.visibility = vis;
 		}
 	}
 	
 	function getElementFromPoint(x, y) {
 		// hide canvas so it isn't picked up
 		applyVisibility('hidden');
+
 		var element = document.elementFromPoint(x, y);
+
 		if ( ! element ) {
 			applyVisibility('visible');
 			return false;
 		}
+
 		if ( element.nodeType == 3 )
 			element = element.parentNode;
+
 		// show the canvas again, hopefully it didn't blink
 		applyVisibility('visible');
 		return element;
@@ -532,10 +545,14 @@ function Asteroids() {
 	/*
 		== Setup ==
 	*/
+	this.gameContainer = document.createElement('div');
+	this.gameContainer.className = 'ASTEROIDSYEAH';
+	document.body.appendChild(this.gameContainer);
 	
 	this.canvas = document.createElement('canvas');
 	this.canvas.setAttribute('width', w);
 	this.canvas.setAttribute('height', h);
+	this.canvas.className = 'ASTEROIDSYEAH';
 	with ( this.canvas.style ) {
 		width = w + "px";
 		height = h + "px";
@@ -583,7 +600,7 @@ function Asteroids() {
 	};
 	addEvent(window, 'resize', eventResize);
 	
-	document.body.appendChild(this.canvas);
+	this.gameContainer.appendChild(this.canvas);
 	this.ctx = this.canvas.getContext("2d");
 	
 	this.ctx.fillStyle = "black";
@@ -603,7 +620,7 @@ function Asteroids() {
 			textAlign = "right";
 		}
 		this.navigation.innerHTML = "(press esc to quit) ";
-		document.body.appendChild(this.navigation);
+		this.gameContainer.appendChild(this.navigation);
 		
 		// points
 		this.points = document.createElement('span');
@@ -642,13 +659,11 @@ function Asteroids() {
 			addClass(c, 'ASTEROIDSYEAH');
 	}
 	
-	addClass(this.canvas, 'ASTEROIDSYEAH');
-	
 	/*
 		== Events ==
 	*/
 	
-	var eventKeydown =  function(event) {
+	var eventKeydown = function(event) {
 		event = event || window.event;
 		that.keysPressed[event.keyCode] = true;
 		
@@ -688,12 +703,7 @@ function Asteroids() {
 	var eventKeyup = function(event) {
 		event = event || window.event;
 		that.keysPressed[event.keyCode] = false;
-		switch ( event.keyCode ) {
-			case code('B'):
-				if ( ! window.ActiveXObject )
-					removeStylesheet("ASTEROIDSYEAH");
-			break;
-		}
+
 		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('B'), code('W'), code('A'), code('S'), code('D')], event.keyCode) != -1 ) {
 			if ( event.preventDefault )
 				event.preventDefault();
@@ -749,7 +759,7 @@ function Asteroids() {
 	this.ctx.drawPlayer = function() {
 		this.save();
 		this.translate(that.pos.x, that.pos.y);
-		this.rotate(-that.dir.angle());
+		this.rotate(that.dir.angle());
 		this.tracePoly(playerVerts);
 		this.fillStyle = "white";
 		this.fill();
@@ -758,21 +768,29 @@ function Asteroids() {
 		this.restore();
 	};
 	
-	this.ctx.drawBullet = function(pos) {
-		this.beginPath();
-		this.arc(pos.x, pos.y, bulletRadius, 0, Math.PI*2, true);
-		this.closePath();
-		this.fill();
+	var PI_SQ = Math.PI*2;
+	
+	this.ctx.drawBullets = function(bullets) {
+		for ( var i = 0; i < bullets.length; i++ ) {
+			this.beginPath();
+			this.arc(bullets[i].pos.x, bullets[i].pos.y, bulletRadius, 0, PI_SQ, true);
+			this.closePath();
+			this.fill();
+		}
 	};
 	
 	var randomParticleColor = function() {
 		return (['red', 'yellow'])[random(0, 1)];
 	};
 	
-	this.ctx.drawParticle = function(particle) {
+	this.ctx.drawParticles = function(particles) {
 		var oldColor = this.strokeStyle;
-		this.strokeStyle = randomParticleColor();
-		this.drawLine(particle.pos.x, particle.pos.y, particle.pos.x - particle.dir.x * 10, particle.pos.y - particle.dir.y * 10);
+		
+		for ( var i = 0; i < particles.length; i++ ) {
+			this.strokeStyle = randomParticleColor();
+			this.drawLine(particles[i].pos.x, particles[i].pos.y, particles[i].pos.x - particles[i].dir.x * 10, particles[i].pos.y - particles[i].dir.y * 10);
+		}
+		
 		this.strokeStyle = oldColor;
 	};
 	
@@ -780,7 +798,7 @@ function Asteroids() {
 		this.save();
 		
 		this.translate(that.pos.x, that.pos.y);
-		this.rotate(-that.dir.angle());
+		this.rotate(that.dir.angle());
 		
 		var oldColor = this.strokeStyle;
 		this.strokeStyle = "red";
@@ -833,7 +851,7 @@ function Asteroids() {
 			drawFlame = true;
 		} else {		
 			// decrease speed of player
-			this.vel.mul(0.96);	
+			this.vel.mul(0.96);
 		}
 		
 		// rotate counter-clockwise
@@ -850,7 +868,7 @@ function Asteroids() {
 		
 		// fire
 		if ( this.keysPressed[code(' ')] && nowTime - this.firedAt > timeBetweenFire ) {
-			this.bullets.push({
+			this.bullets.unshift({
 				'dir': this.dir.cp(),
 				'pos': this.pos.cp(),
 				'startVel': this.vel.cp(),
@@ -860,7 +878,7 @@ function Asteroids() {
 			this.firedAt = nowTime;
 			
 			if ( this.bullets.length > maxBullets ) {
-				arrayRemove(this.bullets, 0);
+				this.bullets.pop();
 			}
 		}
 		
@@ -875,13 +893,7 @@ function Asteroids() {
 			
 			this.updated.blink.time += tDelta * 1000;
 			if ( this.updated.blink.time > timeBetweenBlink ) {
-				if ( this.updated.blink.isActive ) {
-					removeStylesheet("ASTEROIDSYEAH");
-					this.updated.blink.isActive = false;
-				} else {
-					addBlinkStyle();
-					this.updated.blink.isActive = true;
-				}
+				this.toggleBlinkStyle();
 				this.updated.blink.time = 0;
 			}
 		} else {
@@ -916,22 +928,19 @@ function Asteroids() {
 			this.pos.y = 0;
 		} else if ( this.pos.y < 0 ) {
 			window.scrollTo(this.scrollPos.x, this.scrollPos.y - h * 0.75);
-			this.pos.y = h;	
+			this.pos.y = h;
 		}
 		
 		// update positions of bullets
-		for ( var i = 0; i < this.bullets.length; i++ ) {
+		for ( var i = this.bullets.length - 1; i >= 0; i-- ) {
 			// bullets should only live for 2 seconds
 			if ( nowTime - this.bullets[i].cameAlive > 2000 ) {
-				arrayRemove(this.bullets, i);
-				i--;
+				this.bullets.splice(i, 1);
 				forceChange = true;
 				continue;
 			}
 			
 			var bulletVel = this.bullets[i].dir.setLengthNew(bulletSpeed * tDelta).add(this.bullets[i].startVel.mulNew(tDelta));
-			var ray = new Line(this.bullets[i].pos.cp(), this.bullets[i].pos.addNew(bulletVel));
-			ray.shift(this.scrollPos);
 			
 			this.bullets[i].pos.add(bulletVel);
 			boundsCheck(this.bullets[i].pos);
@@ -945,36 +954,34 @@ function Asteroids() {
 			) {
 				didKill = true;
 				addParticles(this.bullets[i].pos);
-				this.dieing.push(murdered);
+				this.dying.push(murdered);
 			
-				arrayRemove(this.bullets, i);
-				i--;
+				this.bullets.splice(i, 1);
 				continue;
 			}
 		}
 		
-		// Remove all dieing elements
-		for ( var i = 0, enemy; enemy = this.dieing[i]; i++ ) {
-			try {
-				// If we have multiple spaceships it might have already been removed
-				if ( enemy.parentNode )
-					window.ASTEROIDS.enemiesKilled++;
-				enemy.parentNode.removeChild(enemy);
-			} catch ( e ) {}
-			
+		if (this.dying.length) {
+			for ( var i = this.dying.length - 1; i >= 0; i-- ) {
+				try {
+					// If we have multiple spaceships it might have already been removed
+					if ( this.dying[i].parentNode )
+						window.ASTEROIDS.enemiesKilled++;
+
+					this.dying[i].parentNode.removeChild(this.dying[i]);
+				} catch ( e ) {}
+			}
+
 			setScore();
-			
-			arrayRemove(this.dieing, i);
-			i--;
+			this.dying = [];
 		}
-		
+
 		// update particles position
-		for ( var i = 0; i < this.particles.length; i++ ) {
+		for ( var i = this.particles.length - 1; i >= 0; i-- ) {
 			this.particles[i].pos.add(this.particles[i].dir.mulNew(particleSpeed * tDelta * Math.random()));
 			
 			if ( nowTime - this.particles[i].cameAlive > 1000 ) {
-				arrayRemove(this.particles, i);
-				i--;
+				this.particles.splice(i, 1);
 				forceChange = true;
 				continue;
 			}
@@ -996,12 +1003,14 @@ function Asteroids() {
 				this.ctx.drawFlames(that.flame);
 			
 			// draw bullets
-			for ( var i = 0; i < this.bullets.length; i++ )
-				this.ctx.drawBullet(this.bullets[i].pos);
+			if (this.bullets.length) {
+				this.ctx.drawBullets(this.bullets);
+			}
 			
 			// draw particles
-			for ( var i = 0; i < this.particles.length; i++ )
-				this.ctx.drawParticle(this.particles[i]);
+			if (this.particles.length) {
+				this.ctx.drawParticles(this.particles);
+			}
 		}
 		this.lastPos = this.pos;
 		
@@ -1022,8 +1031,7 @@ function Asteroids() {
 		isRunning = false;
 		removeStylesheet("ASTEROIDSYEAH");
 		removeClass(document.body, 'ASTEROIDSYEAH');
-		this.canvas.parentNode.removeChild(this.canvas);
-		this.navigation.parentNode.removeChild(this.navigation);
+		this.gameContainer.parentNode.removeChild(this.gameContainer);
 	};
 }
 
@@ -1032,21 +1040,21 @@ if ( ! window.ASTEROIDSPLAYERS )
 
 if ( window.ActiveXObject ) {
 	try {
-    	var xamlScript = document.createElement('script');
-	    xamlScript.setAttribute('type', 'text/xaml');
-	    xamlScript.textContent = '<?xml version="1.0"?><Canvas xmlns="http://schemas.microsoft.com/client/2007"></Canvas>';
+		var xamlScript = document.createElement('script');
+		xamlScript.setAttribute('type', 'text/xaml');
+		xamlScript.textContent = '<?xml version="1.0"?><Canvas xmlns="http://schemas.microsoft.com/client/2007"></Canvas>';
 		document.getElementsByTagName('head')[0].appendChild(xamlScript);
 	} catch ( e ) {}
 	
 	var script = document.createElement("script");
-    script.setAttribute('type', 'text/javascript');
+	script.setAttribute('type', 'text/javascript');
 	script.onreadystatechange = function() {
 		if ( script.readyState == 'loaded' || script.readyState == 'complete' ) {
 			if ( typeof G_vmlCanvasManager != "undefined" )
 				window.ASTEROIDSPLAYERS[window.ASTEROIDSPLAYERS.length] = new Asteroids();
 		}
 	};
-    script.src = "http://erkie.github.com/excanvas.js";    
+	script.src = "http://erkie.github.com/excanvas.js";
 	document.getElementsByTagName('head')[0].appendChild(script);
 }
 else window.ASTEROIDSPLAYERS[window.ASTEROIDSPLAYERS.length] = new Asteroids();
