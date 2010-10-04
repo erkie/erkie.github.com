@@ -160,9 +160,9 @@ function Asteroids() {
 			var v3 = line2.p1, v4 = line2.p2;
 			
 			var denom = ((v4.y - v3.y) * (v2.x - v1.x)) - ((v4.x - v3.x) * (v2.y - v1.y));
-		    var numerator = ((v4.x - v3.x) * (v1.y - v3.y)) - ((v4.y - v3.y) * (v1.x - v3.x));
+			var numerator = ((v4.x - v3.x) * (v1.y - v3.y)) - ((v4.y - v3.y) * (v1.x - v3.x));
 		
-		    var numerator2 = ((v2.x - v1.x) * (v1.y - v3.y)) - ((v2.y - v1.y) * (v1.x - v3.x));
+			var numerator2 = ((v2.x - v1.x) * (v1.y - v3.y)) - ((v2.y - v1.y) * (v1.x - v3.x));
 			
 			if ( denom == 0.0 ) {
 				return false;
@@ -258,10 +258,10 @@ function Asteroids() {
 	var FPS = isIE ? 30 : 50;
 	
 	// units/second
-	var acc           = 300;
-	var maxSpeed      = 600;
-	var rotSpeed      = 360; // one rotation per second
-	var bulletSpeed   = 700;
+	var acc			  = 300;
+	var maxSpeed	  = 600;
+	var rotSpeed	  = 360; // one rotation per second
+	var bulletSpeed	  = 700;
 	var particleSpeed = 400;
 	
 	var timeBetweenFire = 150; // how many milliseconds between shots
@@ -282,13 +282,13 @@ function Asteroids() {
 	
 	// blink style
 	this.toggleBlinkStyle = function () {
-	    if (this.updated.blink.isActive) {
-	        removeClass(document.body, 'ASTEROIDSBLINK');
-	    } else {
-	        addClass(document.body, 'ASTEROIDSBLINK');
-	    }
+		if (this.updated.blink.isActive) {
+			removeClass(document.body, 'ASTEROIDSBLINK');
+		} else {
+			addClass(document.body, 'ASTEROIDSBLINK');
+		}
 
-	    this.updated.blink.isActive = !this.updated.blink.isActive;
+		this.updated.blink.isActive = !this.updated.blink.isActive;
 	};
 
 	addStylesheet("ASTEROIDSYEAH", ".ASTEROIDSBLINK .ASTEROIDSYEAHENEMY { outline: 2px dotted red; }");
@@ -344,31 +344,31 @@ function Asteroids() {
 	var createFlames;
 	
 	(function () {
-    	var rWidth = playerWidth,
-    	    rIncrease = playerWidth * 0.1,
-    	    yWidth = playerWidth * 0.6,
-    	    yIncrease = yWidth * 0.2,
-    	    halfR = rWidth / 2,
-    	    halfY = yWidth / 2,
-    	    halfPlayerHeight = playerHeight / 2;
+		var rWidth = playerWidth,
+			rIncrease = playerWidth * 0.1,
+			yWidth = playerWidth * 0.6,
+			yIncrease = yWidth * 0.2,
+			halfR = rWidth / 2,
+			halfY = yWidth / 2,
+			halfPlayerHeight = playerHeight / 2;
 
-    	createFlames = function () {
-    		// Firstly create red flames
-    		that.flame.r = [[-1 * halfPlayerHeight, -1 * halfR]];
-    		that.flame.y = [[-1 * halfPlayerHeight, -1 * halfY]];
+		createFlames = function () {
+			// Firstly create red flames
+			that.flame.r = [[-1 * halfPlayerHeight, -1 * halfR]];
+			that.flame.y = [[-1 * halfPlayerHeight, -1 * halfY]];
 
-    		for ( var x = 0; x < rWidth; x += rIncrease ) {
-    			that.flame.r.push([-random(2, 7) - halfPlayerHeight, x - halfR]);
-    		}
-    		
-    		that.flame.r.push([-1 * halfPlayerHeight, halfR]);
+			for ( var x = 0; x < rWidth; x += rIncrease ) {
+				that.flame.r.push([-random(2, 7) - halfPlayerHeight, x - halfR]);
+			}
 
-    		for ( var x = 0; x < yWidth; x += yIncrease ) {
-    			that.flame.y.push([-random(2, 7) - halfPlayerHeight, x - halfY]);
-    		}
-    		
-    		that.flame.y.push([-1 * halfPlayerHeight, halfY]);
-    	};
+			that.flame.r.push([-1 * halfPlayerHeight, halfR]);
+
+			for ( var x = 0; x < yWidth; x += yIncrease ) {
+				that.flame.y.push([-random(2, 7) - halfPlayerHeight, x - halfY]);
+			}
+
+			that.flame.y.push([-1 * halfPlayerHeight, halfY]);
+		};
 	})();
 	
 	createFlames();
@@ -456,8 +456,8 @@ function Asteroids() {
 		var element = document.elementFromPoint(x, y);
 
 		if ( ! element ) {
-    		that.gameContainer.style.visibility = 'visible';
-		    return false;
+			that.gameContainer.style.visibility = 'visible';
+			return false;
 		}
 
 		if ( element.nodeType == 3 ) {
@@ -651,7 +651,7 @@ function Asteroids() {
 		== Events ==
 	*/
 	
-	var eventKeydown =  function(event) {
+	var eventKeydown =	function(event) {
 		event = event || window.event;
 		that.keysPressed[event.keyCode] = true;
 		
@@ -747,7 +747,7 @@ function Asteroids() {
 	this.ctx.drawPlayer = function() {
 		this.save();
 		this.translate(that.pos.x, that.pos.y);
-        this.rotate(that.dir.angle());
+		this.rotate(that.dir.angle());
 		this.tracePoly(playerVerts);
 		this.fillStyle = "white";
 		this.fill();
@@ -760,10 +760,10 @@ function Asteroids() {
 	
 	this.ctx.drawBullets = function(bullets) {
 		for ( var i = 0; i < bullets.length; i++ ) {
-    		this.beginPath();
-    		this.arc(bullets[i].pos.x, bullets[i].pos.y, bulletRadius, 0, PI_SQ, true);
-    		this.closePath();
-    		this.fill();
+			this.beginPath();
+			this.arc(bullets[i].pos.x, bullets[i].pos.y, bulletRadius, 0, PI_SQ, true);
+			this.closePath();
+			this.fill();
 		}
 	};
 	
@@ -775,8 +775,8 @@ function Asteroids() {
 		var oldColor = this.strokeStyle;
 		
 		for ( var i = 0; i < particles.length; i++ ) {
-    		this.strokeStyle = randomParticleColor();
-    		this.drawLine(particles[i].pos.x, particles[i].pos.y, particles[i].pos.x - particles[i].dir.x * 10, particles[i].pos.y - particles[i].dir.y * 10);
+			this.strokeStyle = randomParticleColor();
+			this.drawLine(particles[i].pos.x, particles[i].pos.y, particles[i].pos.x - particles[i].dir.x * 10, particles[i].pos.y - particles[i].dir.y * 10);
 		}
 		
 		this.strokeStyle = oldColor;
@@ -786,7 +786,7 @@ function Asteroids() {
 		this.save();
 		
 		this.translate(that.pos.x, that.pos.y);
-        this.rotate(that.dir.angle());
+		this.rotate(that.dir.angle());
 		
 		var oldColor = this.strokeStyle;
 		this.strokeStyle = "red";
@@ -839,7 +839,7 @@ function Asteroids() {
 			drawFlame = true;
 		} else {		
 			// decrease speed of player
-			this.vel.mul(0.96);	
+			this.vel.mul(0.96);
 		}
 		
 		// rotate counter-clockwise
@@ -866,7 +866,7 @@ function Asteroids() {
 			this.firedAt = nowTime;
 			
 			if ( this.bullets.length > maxBullets ) {
-			    this.bullets.pop();
+				this.bullets.pop();
 			}
 		}
 		
@@ -881,7 +881,7 @@ function Asteroids() {
 			
 			this.updated.blink.time += tDelta * 1000;
 			if ( this.updated.blink.time > timeBetweenBlink ) {
-			    this.toggleBlinkStyle();
+				this.toggleBlinkStyle();
 				this.updated.blink.time = 0;
 			}
 		} else {
@@ -916,14 +916,14 @@ function Asteroids() {
 			this.pos.y = 0;
 		} else if ( this.pos.y < 0 ) {
 			window.scrollTo(this.scrollPos.x, this.scrollPos.y - h * 0.75);
-			this.pos.y = h;	
+			this.pos.y = h;
 		}
 		
 		// update positions of bullets
 		for ( var i = this.bullets.length - 1; i >= 0; i-- ) {
 			// bullets should only live for 2 seconds
 			if ( nowTime - this.bullets[i].cameAlive > 2000 ) {
-			    this.bullets.splice(i, 1);
+				this.bullets.splice(i, 1);
 				forceChange = true;
 				continue;
 			}
@@ -944,21 +944,21 @@ function Asteroids() {
 				addParticles(this.bullets[i].pos);
 				this.dying.push(murdered);
 			
-			    this.bullets.splice(i, 1);
+				this.bullets.splice(i, 1);
 				continue;
 			}
 		}
 		
 		if (this.dying.length) {
-    		for ( var i = this.dying.length - 1; i >= 0; i-- ) {
-    		    try {
-    		        this.dying[i].parentNode.removeChild(this.dying[i]);
-    		    } catch ( e ) {}
-    		}
+			for ( var i = this.dying.length - 1; i >= 0; i-- ) {
+				try {
+					this.dying[i].parentNode.removeChild(this.dying[i]);
+				} catch ( e ) {}
+			}
 
-    		this.enemiesKilled += this.dying.length;
-    	    setScore();
-    		this.dying = [];
+			this.enemiesKilled += this.dying.length;
+			setScore();
+			this.dying = [];
 		}
 
 		// update particles position
@@ -966,7 +966,7 @@ function Asteroids() {
 			this.particles[i].pos.add(this.particles[i].dir.mulNew(particleSpeed * tDelta * Math.random()));
 			
 			if ( nowTime - this.particles[i].cameAlive > 1000 ) {
-			    this.particles.splice(i, 1);
+				this.particles.splice(i, 1);
 				forceChange = true;
 				continue;
 			}
@@ -989,13 +989,13 @@ function Asteroids() {
 			
 			// draw bullets
 			if (this.bullets.length) {
-    			this.ctx.drawBullets(this.bullets);
+				this.ctx.drawBullets(this.bullets);
 			}
 			
 			// draw particles
 			if (this.particles.length) {
-    			this.ctx.drawParticles(this.particles);
-    		}
+				this.ctx.drawParticles(this.particles);
+			}
 		}
 		this.lastPos = this.pos;
 		
@@ -1022,21 +1022,21 @@ function Asteroids() {
 
 if ( window.ActiveXObject ) {
 	try {
-    	var xamlScript = document.createElement('script');
-	    xamlScript.setAttribute('type', 'text/xaml');
-	    xamlScript.textContent = '<?xml version="1.0"?><Canvas xmlns="http://schemas.microsoft.com/client/2007"></Canvas>';
+		var xamlScript = document.createElement('script');
+		xamlScript.setAttribute('type', 'text/xaml');
+		xamlScript.textContent = '<?xml version="1.0"?><Canvas xmlns="http://schemas.microsoft.com/client/2007"></Canvas>';
 		document.getElementsByTagName('head')[0].appendChild(xamlScript);
 	} catch ( e ) {}
 	
 	var script = document.createElement("script");
-    script.setAttribute('type', 'text/javascript');
+	script.setAttribute('type', 'text/javascript');
 	script.onreadystatechange = function() {
 		if ( script.readyState == 'loaded' || script.readyState == 'complete' ) {
 			if ( typeof G_vmlCanvasManager != "undefined" )
 				new Asteroids();
 		}
 	};
-    script.src = "http://erkie.github.com/excanvas.js";    
+	script.src = "http://erkie.github.com/excanvas.js";
 	document.getElementsByTagName('head')[0].appendChild(script);
 }
 else new Asteroids();
