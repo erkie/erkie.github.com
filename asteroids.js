@@ -591,6 +591,12 @@ function Asteroids() {
 		var y = e.pageY || (e.clientY + document.documentElement.scrollTop);
 		message.style.left = x - message.offsetWidth/2 + 'px';
 		message.style.top = y - message.offsetHeight/2 + 'px';
+		
+		setTimeout(function() {
+			try {
+				message.parentNode.removeChild(message);
+			} catch ( e ) {}
+		}, 1000);
 	});
 	
 	var eventResize = function() {
