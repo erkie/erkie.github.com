@@ -601,11 +601,19 @@ function Asteroids() {
 	});
 	
 	var eventResize = function() {
+		that.canvas.style.display = "none";
+		
 		w = document.documentElement.clientWidth;
 		h = document.documentElement.clientHeight;
 		
 		that.canvas.setAttribute('width', w);
 		that.canvas.setAttribute('height', h);
+		
+		with ( that.canvas.style ) {
+			display = "block";
+			width = w + "px";
+			height = h + "px";
+		}
 	};
 	addEvent(window, 'resize', eventResize);
 	
