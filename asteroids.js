@@ -490,13 +490,14 @@ function Asteroids() {
 	};
 	
 	function hasOnlyTextualChildren(element) {
-		if ( indexOf(hiddenTypes, element.tagName) != -1 ) return false;
+		if ( element.offsetLeft < -100 && element.offsetWidth > 0 && element.offsetHeight > 0 ) return false;
+		if ( indexOf(hiddenTypes, element.tagName) != -1 ) return true;
+		
 		if ( element.offsetWidth == 0 && element.offsetHeight == 0 ) return false;
 		for ( var i = 0; i < element.childNodes.length; i++ ) {
 			// <br /> doesn't count... and empty elements
 			if (
-				element.childNodes[i].nodeType != 3
-				&& indexOf(hiddenTypes, element.childNodes[i].tagName) == -1
+				indexOf(hiddenTypes, element.childNodes[i].tagName) == -1
 				&& element.childNodes[i].childNodes.length != 0
 			) return false;
 		}
