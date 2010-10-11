@@ -245,14 +245,22 @@ function Asteroids() {
 	var that = this;
 	
 	var isIE = !!window.ActiveXObject; // IE gets less performance-intensive
+	var isIEQuirks = isIE && document.compatMode == "BackCompat";
 	
 	// configuration directives are placed in local variables
 	var w = document.documentElement.clientWidth, h = document.documentElement.clientHeight;
+	if ( isIEQuirks ) {
+		w = document.body.clientWidth;
+		h = document.body.clientHeight;
+	}
+	
 	var playerWidth = 20, playerHeight = 30;
 	
 	var playerVerts = [[-1 * playerHeight/2, -1 * playerWidth/2], [-1 * playerHeight/2, playerWidth/2], [playerHeight/2, 0]];
 	
-	var ignoredTypes = ['HTML', 'HEAD', 'BODY', 'SCRIPT', 'TITLE', 'META', 'STYLE', 'LINK', 'SHAPE', 'LINE', 'GROUP', 'IMAGE', 'STROKE', 'FILL', 'SKEW', 'PATH', 'TEXTPATH']; // Half of these are for IE g_vml
+	var ignoredTypes = ['HTML', 'HEAD', 'BODY', 'SCRIPT', 'TITLE', 'META', 'STYLE', 'LINK'];
+	if ( window.ActiveXObject )
+		ignoredTypes = ['HTML', 'HEAD', 'BODY', 'SCRIPT', 'TITLE', 'META', 'STYLE', 'LINK', 'SHAPE', 'LINE', 'GROUP', 'IMAGE', 'STROKE', 'FILL', 'SKEW', 'PATH', 'TEXTPATH', 'INS']; // Half of these are for IE g_vml
 	var hiddenTypes = ['BR', 'HR'];
 	
 	var FPS = 50;
@@ -601,18 +609,31 @@ function Asteroids() {
 	});
 	
 	var eventResize = function() {
-		that.canvas.style.display = "none";
-		
-		w = document.documentElement.clientWidth;
-		h = document.documentElement.clientHeight;
-		
-		that.canvas.setAttribute('width', w);
-		that.canvas.setAttribute('height', h);
-		
-		with ( that.canvas.style ) {
-			display = "block";
-			width = w + "px";
-			height = h + "px";
+		if ( ! isIE ) {
+			that.canvas.style.display = "none";
+			
+			w = document.documentElement.clientWidth;
+			h = document.documentElement.clientHeight;
+			
+			that.canvas.setAttribute('width', w);
+			that.canvas.setAttribute('height', h);
+			
+			with ( that.canvas.style ) {
+				display = "block";
+				width = w + "px";
+				height = h + "px";
+			}
+		} else {
+			w = document.documentElement.clientWidth;
+			h = document.documentElement.clientHeight;
+			
+			if ( isIEQuirks ) {
+				w = document.body.clientWidth;
+				h = document.body.clientHeight;
+			}
+			
+			that.canvas.setAttribute('width', w);
+			that.canvas.setAttribute('height', h);
 		}
 	};
 	addEvent(window, 'resize', eventResize);
@@ -649,6 +670,14 @@ function Asteroids() {
 	} else {
 		this.navigation = document.getElementById('ASTEROIDS-NAVIGATION');
 		this.points = document.getElementById('ASTEROIDS-POINTS');
+	}
+	
+	// Because IE quirks does not understand position: fixed we set to absolute and just reposition it everything frame
+	if ( isIEQuirks ) {
+		this.gameContainer.style.position =
+			this.canvas.style.position =
+			this.navigation.style.position 
+				= "absolute";
 	}
 	
 	setScore();
@@ -820,6 +849,11 @@ function Asteroids() {
 	/*
 		Game loop
 	*/
+	
+	// Attempt to focus window if possible, so keyboard events are posted to us
+	try {
+		window.focus();
+	} catch ( e ) {}
 	
 	addParticles(this.pos);
 	addClass(document.body, 'ASTEROIDSYEAH');
@@ -995,6 +1029,18 @@ function Asteroids() {
 		// drawing
 		// ==
 		
+		// Reposition the canvas area for IE quirks because it does not understand position: fixed
+		if ( isIEQuirks ) {
+			this.gameContainer.style.left =
+				this.canvas.style.left = document.documentElement.scrollLeft + "px";
+			this.gameContainer.style.top =
+				this.canvas.style.top = document.documentElement.scrollTop + "px";
+			
+			this.navigation.style.right = "10px";
+			this.navigation.style.top
+				= document.documentElement.scrollTop + document.body.clientHeight - this.navigation.clientHeight - 10 + "px";
+		}
+		
 		// clear
 		if ( forceChange || this.bullets.length != 0 || this.particles.length != 0 || ! this.pos.is(this.lastPos) || this.vel.len() > 0 ) {
 			this.ctx.clear();
@@ -1017,6 +1063,8 @@ function Asteroids() {
 			}
 		}
 		this.lastPos = this.pos;
+		
+		document.title = "hahahahaha " + (new Date().getTime());
 		
 		setTimeout(updateFunc, 1000 / FPS);
 	}
@@ -1042,14 +1090,14 @@ function Asteroids() {
 if ( ! window.ASTEROIDSPLAYERS )
 	window.ASTEROIDSPLAYERS = [];
 
-if ( window.ActiveXObject ) {
+if ( window.ActiveXObject && ! document.createElement('canvas').getContext ) {
 	try {
 		var xamlScript = document.createElement('script');
 		xamlScript.setAttribute('type', 'text/xaml');
 		xamlScript.textContent = '<?xml version="1.0"?><Canvas xmlns="http://schemas.microsoft.com/client/2007"></Canvas>';
 		document.getElementsByTagName('head')[0].appendChild(xamlScript);
 	} catch ( e ) {}
-	
+
 	var script = document.createElement("script");
 	script.setAttribute('type', 'text/javascript');
 	script.onreadystatechange = function() {
