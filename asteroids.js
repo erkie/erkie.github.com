@@ -1064,8 +1064,6 @@ function Asteroids() {
 		}
 		this.lastPos = this.pos;
 		
-		document.title = "hahahahaha " + (new Date().getTime());
-		
 		setTimeout(updateFunc, 1000 / FPS);
 	}
 	
