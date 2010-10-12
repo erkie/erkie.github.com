@@ -1063,15 +1063,19 @@ function Asteroids() {
 			}
 		}
 		this.lastPos = this.pos;
-		
-		setTimeout(updateFunc, 1000 / FPS);
 	}
 	
 	// Start timer
 	var updateFunc = function() {
-		that.update.call(that);
+		try {
+			that.update.call(that);
+		}
+		catch (e) {
+			clearInterval(interval);
+			throw e;
+		}
 	};
-	setTimeout(updateFunc, 1000 / FPS);
+	var interval = setInterval(updateFunc, 1000 / FPS);
 	
 	function destroy() {
 		removeEvent(document, 'keydown', eventKeydown);
