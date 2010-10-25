@@ -58,6 +58,16 @@
 			<p><a id="doit" href="javascript:var%20s%20=%20document.createElement('script');s.type='text/javascript';document.body.appendChild(s);s.src='http://erkie.github.com/asteroids.min.js';void(0);" title="Kick ass">Kick ass</a>
 			</p>
 			
+			<script type="text/javascript">
+				// "PG" version
+				if ( document.location.search.indexOf('pg') != -1 ) {
+					var doit = document.getElementById('doit');
+					doit.title = 'Webstroyer';
+					doit.innerHTML = 'Webstroyer';
+					doit.style.backgroundImage = 'url(button-pg.png)';
+				}
+			</script>
+			
 			<p class="none-ie"><a href="javascript:var%20s%20=%20document.createElement('script');s.type='text/javascript';document.body.appendChild(s);s.src='http://erkie.github.com/asteroids.min.js';void(0);">Drag this bookmarklet to your bookmarks bar or a tab and start having some fun on other pages too!</a></p>
 			
 			<!--[if IE]>
@@ -137,15 +147,6 @@
 					ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
 					var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 				})();
-			</script>
-			
-			<script type="text/javascript">
-				// "PG" version
-				if ( document.location.search.indexOf('pg') != -1 ) {
-					var doit = document.getElementById('doit');
-					doit.title = 'Webstroyer';
-					doit.innerHTML = 'Webstroyer';
-				}
 			</script>
 		</div>
 	</body>
