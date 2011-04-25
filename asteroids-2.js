@@ -1395,6 +1395,7 @@
 			this.polyString = '';
 			
 			this.raphael = Raphael(this.rect.pos.x-this.rect.size.width/2, this.rect.pos.y-this.rect.size.height/2, this.rect.size.width, this.rect.size.height);
+			this.raphael.canvas.style.zIndex = '10000';
 			
 			// -- bad style?
 			window.KICKASSGAME.registerElement(this.raphael.canvas);
@@ -1505,6 +1506,7 @@
 			this.canvas.className = 'KICKASSELEMENT';
 			with ( this.canvas.style ) {
 				position = 'absolute';
+				zIndex = '10000';
 			}
 			
 			// -- Bad style?
