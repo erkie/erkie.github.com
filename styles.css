@@ -8,6 +8,8 @@ a {
 	text-decoration: none;
 }
 
+a img { border: none; }
+
 .clear {
 	clear: both;
 }
@@ -59,8 +61,8 @@ h1 {
 	
 	#how-to {
 		border-left: 1px solid #ccc;
-		margin-left: 50px;
-		padding-left: 50px;
+		margin-left: 40px;
+		padding-left: 40px;
 		padding-top: 0px;
 		width: 300px;
 	}
