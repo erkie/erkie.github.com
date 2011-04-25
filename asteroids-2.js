@@ -667,6 +667,8 @@
 		create: function() {
 			// Container 
 			this.container = document.createElement('div');
+			this.container.className = 'KICKASSELEMENT';
+			
 			with ( this.container.style ) {
 				position = 'fixed';
 				bottom = '20px';
@@ -680,12 +682,14 @@
 			
 			// Points view
 			this.points = document.createElement('div');
+			this.points.className = 'KICKASSELEMENT';
 			this.points.style.fontSize = '30pt';
 			this.points.innerHTML = this.numPoints;
 			this.container.appendChild(this.points);
 			
 			// Esc to quit text
 			this.escToQuit = document.createElement('div');
+			this.escToQuit.className = 'KICKASSELEMENT';
 			this.escToQuit.innerHTML = 'Press esc to quit';
 			this.container.appendChild(this.escToQuit);
 			
@@ -938,6 +942,10 @@
 		initialize: function() {
 			this.bullets = {};
 			this.lastFired = 0;
+			
+			this.lastBlink = 0;
+			this.blinkActive = false;
+			this.enemyIndex = [];
 		},
 		
 		update: function(tdelta) {
@@ -946,6 +954,13 @@
 				for ( var i = 0, player; player = this.game.players[i]; i++ )
 					this.addBulletFromPlayer(player);
 				this.lastFired = now();
+			}
+			
+			// If B is pressed, show remaining enemies
+			if ( this.game.isKeyPressed('B') ) {
+				this.blink();
+			} else {
+				this.endBlink();
 			}
 			
 			for ( var key in this.bullets ) if ( this.bullets.hasOwnProperty(key) ) {
@@ -986,6 +1001,70 @@
 		
 		/*
 			Method:
+				blink
+			
+			Shows a red border around all remaining enemies every 0.25 seconds
+		*/
+		
+		blink: function() {
+			if ( now() - this.lastBlink > 250 ) {
+				for ( var i = 0, el; el = this.enemyIndex[i]; i++ ) {
+					if ( ! this.blinkActive )
+						el.style.outline = '1px solid red';
+					else
+						el.style.outline = el.KICKASSOLDBORDER;
+				}					
+				this.blinkActive = ! this.blinkActive;
+				this.lastBlink = now();
+				
+				if ( ! this.blinkActive ) {
+					this.updateEnemyIndex();
+				}
+			}
+		},
+		
+		/*
+			Method:
+				endBlink
+			
+			End any blinking action (if there is any)
+		*/
+		
+		endBlink: function() {
+			// endBlink is called every run loop if B isn't pressed, so only
+			// reset everything if there is something to reset
+			if ( this.enemyIndex.length ) {
+				for ( var i = 0, el; el = this.enemyIndex[i]; i++ )
+					el.style.outline = el.KICKASSOLDBORDER;
+				
+				this.enemyIndex = [];
+				this.lastBlink = 0;
+				this.blinkActive = false;
+			}
+		},
+		
+		/*
+			Method:
+				updateEnemyIndex
+			
+			Update index of destroyable enemies
+		*/
+		
+		updateEnemyIndex: function() {
+			var all = document.getElementsByTagName('*');
+			this.enemyIndex = [];
+			
+			for ( var i = 0, el; el = all[i]; i++ ) {
+				if ( this.hasOnlyTextualChildren(el) ) {
+					this.enemyIndex.push(el);
+					
+					el.KICKASSOLDBORDER = el.style.outline || (document.defaultView.getComputedStyle(el, null).outline);
+				}
+			}
+		},
+		
+		/*
+			Method:
 				addBulletFromPlayer
 			
 			Add bullet at the position of a player's cannon
@@ -1001,6 +1080,7 @@
 			}
 			
 			var bullet = new Bullet();
+			bullet.manager = this;
 			bullet.pos = player.pos.cp();
 			bullet.dir = player.dir.cp();
 			bullet.game = this.game;
@@ -1013,6 +1093,40 @@
 				this.bullets[pid] = [];
 			
 			this.bullets[pid].push(bullet);
+		},
+		
+		/*
+			Method:
+				hasOnlyTextualChildren
+			
+			Find out if an element is suitable for destruction by checking if it
+			only has "textual" children. It wouldn't be too fun a game if you could
+			simply destroy the wrapper-div of a page on your first shot, right?
+		*/
+		
+		hasOnlyTextualChildren: function(element) {
+			if ( element == document.defaultView || element == document.body)
+				return false;
+			
+			if ( element.className && element.className.indexOf('KICKASSELEMENT') != -1 )
+				return false;
+			
+			for ( var i = 0; i < element.childNodes.length; i++ ) {
+				if (element.childNodes[i].childNodes[0]) {
+					var children = element.childNodes;
+					for ( var i = 0, child; child = children[i]; i++ ) {
+						if ( child.nodeType != 1 || child.style.visibility == 'hidden' || child.style.display == 'none' )
+							continue;
+						
+						if ( child.offsetHeight == 0 || child.offsetWidth == 0 )
+							continue;
+						
+						if ( ELEMENTSTHATCOUNTASTEXTUAL.indexOf(child.tagName) == -1 && ELEMENTSTHATARENOTTOBEINCLUDED.indexOf(child.tagName) == -1 )
+							return false;
+					}
+				}
+			}
+			return true;
 		},
 		
 		destroy: function() {
@@ -1068,37 +1182,9 @@
 			var element = document.elementFromPoint(this.pos.x, this.pos.y);
 			if ( element && element.nodeType == 3 )
 				element = element.parentNode;
-			return element && element != document.body && this.hasOnlyTextualChildren(element) ? element : false;
+			return element && element != document.documentElement && this.manager.hasOnlyTextualChildren(element) ? element : false;
 		},
-		
-		/*
-			Method:
-				hasOnlyTextualChildren
-			
-			Find out if an element is suitable for destruction by checking if it
-			only has "textual" children. It wouldn't be too fun a game if you could
-			simply destroy the wrapper-div of a page on your first shot, right?
-		*/
-		
-		hasOnlyTextualChildren: function(element) {
-			for ( var i = 0; i < element.childNodes.length; i++ ) {
-				if (element.childNodes[i].childNodes[0]) {
-					var children = element.childNodes;
-					for ( var i = 0, child; child = children[i]; i++ ) {
-						if ( child.nodeType != 1 || child.style.visibility == 'hidden' || child.style.display == 'none' )
-							continue;
-						
-						if ( child.offsetHeight == 0 || child.offsetWidth == 0 )
-							continue;
-						
-						if ( ELEMENTSTHATCOUNTASTEXTUAL.indexOf(child.tagName) == -1 && ELEMENTSTHATARENOTTOBEINCLUDED.indexOf(child.tagName) == -1 )
-							return false;
-					}
-				}
-			}
-			return true;
-		},
-		
+				
 		// See: <Player.checkBounds>
 		checkBounds: function() {
 			var w = this.game.windowSize.width;
@@ -1399,6 +1485,7 @@
 			
 			this.raphael = Raphael(this.rect.pos.x-this.rect.size.width/2, this.rect.pos.y-this.rect.size.height/2, this.rect.size.width, this.rect.size.height);
 			this.raphael.canvas.style.zIndex = '10000';
+			this.raphael.canvas.className = 'KICKASSELEMENT';
 			
 			// -- bad style?
 			window.KICKASSGAME.registerElement(this.raphael.canvas);
