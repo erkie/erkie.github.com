@@ -1068,7 +1068,7 @@
 			var element = document.elementFromPoint(this.pos.x, this.pos.y);
 			if ( element && element.nodeType == 3 )
 				element = element.parentNode;
-			return element && this.hasOnlyTextualChildren(element) ? element : false;
+			return element && element != document.body && this.hasOnlyTextualChildren(element) ? element : false;
 		},
 		
 		/*
