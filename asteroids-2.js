@@ -1088,6 +1088,9 @@
 						if ( child.nodeType != 1 || child.style.visibility == 'hidden' || child.style.display == 'none' )
 							continue;
 						
+						if ( child.offsetHeight == 0 || child.offsetWidth == 0 )
+							continue;
+						
 						if ( ELEMENTSTHATCOUNTASTEXTUAL.indexOf(child.tagName) == -1 && ELEMENTSTHATARENOTTOBEINCLUDED.indexOf(child.tagName) == -1 )
 							return false;
 					}
