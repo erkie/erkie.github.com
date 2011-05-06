@@ -675,7 +675,7 @@
 				right = '20px';
 				font = '16pt Arial';
 				color = 'black';
-				zIndex = '10000';
+				zIndex = '1000000';
 				textAlign = 'right';
 			}
 			document.body.appendChild(this.container);
@@ -1303,7 +1303,7 @@
 			this.particles = [];
 			
 			// Generate 
-			for ( var i = 0; i < 40; i++ ) {
+			for ( var i = 0, j = (typeof Raphael != 'undefined') ? 10 : 40; i < j; i++ ) {
 				this.particles.push({
 					dir: (new Vector(random(0, 20)-10, random(0, 20)-10)).normalize(),
 					vel: this.particleVel.cp(),
@@ -1596,7 +1596,7 @@
 			this.canvas.className = 'KICKASSELEMENT';
 			with ( this.canvas.style ) {
 				position = 'absolute';
-				zIndex = '10000';
+				zIndex = '1000000';
 			}
 			
 			// -- Bad style?
