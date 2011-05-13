@@ -795,16 +795,30 @@ function Asteroids() {
 		this.closePath();
 	};
 	
+	var THEPLAYER = false;
+	if ( window.KICKASSIMG ) {
+		THEPLAYER = document.createElement('img');
+		THEPLAYER.src = window.KICKASSIMG;
+	}
+	
 	this.ctx.drawPlayer = function() {
-		this.save();
-		this.translate(that.pos.x, that.pos.y);
-		this.rotate(that.dir.angle());
-		this.tracePoly(playerVerts);
-		this.fillStyle = "white";
-		this.fill();
-		this.tracePoly(playerVerts);
-		this.stroke();
-		this.restore();
+		if ( ! THEPLAYER ) {
+			this.save();
+			this.translate(that.pos.x, that.pos.y);
+			this.rotate(that.dir.angle());
+			this.tracePoly(playerVerts);
+			this.fillStyle = "white";
+			this.fill();
+			this.tracePoly(playerVerts);
+			this.stroke();
+			this.restore();
+		} else {
+			this.save();
+			this.translate(that.pos.x, that.pos.y);
+			this.rotate(that.dir.angle()+Math.PI/2);
+			this.drawImage(THEPLAYER, -THEPLAYER.width/2, -THEPLAYER.height/2);
+			this.restore();
+		}
 	};
 	
 	var PI_SQ = Math.PI*2;
@@ -834,6 +848,8 @@ function Asteroids() {
 	};
 	
 	this.ctx.drawFlames = function(flame) {
+		if ( THEPLAYER ) return;
+		
 		this.save();
 		
 		this.translate(that.pos.x, that.pos.y);
