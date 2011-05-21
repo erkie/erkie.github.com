@@ -673,6 +673,7 @@ function Asteroids() {
 			position = 'absolute';
 			top = '10px';
 			right = '10px';
+			zIndex = '9999999';
 		}
 		this.appstore.innerHTML = '<a href="http://itunes.apple.com/us/app/kick-ass-destroy-the-web/id436623109?mt=8&ls=1"><img src="http://erkie.github.com/appstore.png" style="border: none" alt="Get the mobile version" /></a>';
 		document.body.appendChild(this.appstore);
