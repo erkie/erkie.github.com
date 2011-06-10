@@ -1,0 +1,71 @@
+var jsmin = require("jsmin"),
+    read = require("fs").readFileSync,
+    write = require("fs").writeFileSync,
+    fs = require("fs"),
+    qunit = require("qunit"),
+    print = console.log;
+
+var deps = [
+	'class.js', 'vector.js', 'rect.js', 'util.js', 'kickass.js', 'menumanager.js',
+	'player.js', 'bulletmanager.js', 'bullet.js', 'enemymanager.js', 'enemy.js',
+	'explosionmanager.js', 'explosion.js', 'sheet.js', 'sheetraphael.js', 'sheetcanvas.js'];
+
+deps = deps.map(function(f) { return 'src/' + f; });
+
+function buildTop() {
+	// Add license up top
+	var result = read("src/LICENSE");
+	
+	// Wrap everything in a nice closure
+    result += "(function(window) {";
+
+	return result;
+};
+
+function buildBottom() {
+	// Add bootstrapping code, the code that starts the game
+    var result = read('bootstrap.js');
+    
+    // End closure from buildTop
+	result += "})(exports || window);";
+	
+	return result;
+}
+
+task('default', ['kickass.js'], function() {
+	console.log("Have a nice day");
+});
+
+// The default build is used for development, and is just all files merged
+file('kickass.js', deps, function() {
+	var result = buildTop();
+
+	// Include all files them in the right order
+    deps.forEach(function(filename) {
+    	print("Adding " + filename);
+        result += read(filename);
+    });
+    
+    result += buildBottom();
+
+	print("Write development build");
+    write("kickass.js", result);
+});
+
+// The release build is all files merged and compressed
+task('release', [], function() {
+	var result = buildTop();
+	
+	deps.forEach(function(filename) {
+		print("Adding and shrinking " + filename);
+		result += jsmin.jsmin(read(filename));
+	});
+	
+	result += buildBottom();
+	
+	write("kickass-release.js", result);
+});
+
+task('test', [], function() {
+	require('./testrunner.cmd.js');
+});
