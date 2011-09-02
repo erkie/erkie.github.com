@@ -1,9 +1,14 @@
+// See license: https://github.com/erkie/erkie.github.com/blob/master/README
+
 (function() {
 function Asteroids() {
 	if ( ! window.ASTEROIDS )
 		window.ASTEROIDS = {
-			enemiesKilled: 0
+			enemiesKilled: 0,
+			startedPlaying: (new Date()).getTime()
 		};
+	
+	var BASEPATH = 'http://kickassapp.com/';
 	
 	/*
 		Classes
@@ -174,69 +179,96 @@ function Asteroids() {
 		}
 	};
 	
-	/*function Highscores() {
-		var w = (document.clientWidth || window.innerWidth);
-		var h = (document.clientHeight || window.innerHeight);
-		
-		this.container = document.createElement('div');
-		this.container.className = "ASTEROIDSYEAH";
-		with ( this.container.style ) {
-			position = "fixed";
-			top = (h / 2 - 250) + "px";
-			left = (w / 2 - 250) + "px";
-			width = "500px";
-			height = "500px";
-			MozBoxShadow = WebkitBoxShadow = "0 0 25px #000";
-			zIndex = "10002";
-		};
-		document.body.appendChild(this.container);
-		
-		// Create iframe
-		this.iframe = document.createElement('iframe');
-		this.iframe.className = "ASTEROIDSYEAH";
-		this.iframe.width = this.iframe.height = 500;
-		this.iframe.src = highscoreURL;
-		this.iframe.frameBorder = 0;
-		this.container.appendChild(this.iframe);
-		
-		// Create close button
-		this.close = document.createElement('a');
-		this.close.href = "#";
-		this.close.onclick = function() {
-			that.highscores.hide();
-		};
-		this.close.innerHTML = "X";
-		with ( this.close.style ) {
-			position = "absolute";
-			display = "block";
-			width = "24px";
-			height = "24px";
-			top = "-12px";
-			right = "-12px";
-			background = "url(" + closeURL + ")";
-			textIndent = "-10000px";
-			outline = "none";
-			textDecoration = "none";
-			fontFamily = "Arial";
-			zIndex = "10003";
-		}
-		this.container.appendChild(this.close);
+	function Highscores() {
+	  
 	};
 	
 	Highscores.prototype = {
+	  build: function() {
+	      var self = this;
+	    
+    		var w = (document.clientWidth || window.innerWidth || document.documentElement.clientWidth);
+    		var h = (document.clientHeight || window.innerHeight || document.documentElement.clientHeight);
+
+    		this.container = document.createElement('div');
+    		this.container.className = "ASTEROIDSYEAH";
+    		with ( this.container.style ) {
+    			position = "fixed";
+    			top = parseInt(h / 2 - 250, 10) + "px";
+    			left = parseInt(w / 2 - 250, 10) + "px";
+    			width = "500px";
+    			height = "500px";
+    			boxShadow = MsBoxShadow = OBoxShadow = MozBoxShadow = WebkitBoxShadow = "0 0 25px #000";
+    			zIndex = "1000002";
+    			webkitTransform = 'scale(0, 0)';
+    			webkitTransition = "-webkit-transform 500ms";
+    			background = '#222';
+    		};
+    		document.body.appendChild(this.container);
+
+    		// Create iframe
+    		this.iframe = document.createElement('iframe');
+    		this.iframe.className = "ASTEROIDSYEAH";
+    		this.iframe.width = this.iframe.height = 500;
+    		this.iframe.frameBorder = 0;
+    		this.container.appendChild(this.iframe);
+
+    		// Create close button
+    		this.close = document.createElement('a');
+    		this.close.href = "#";
+    		this.close.onclick = function() {
+    			self.hide();
+    			return false;
+    		};
+    		this.close.innerHTML = "X";
+    		with ( this.close.style ) {
+    			position = "absolute";
+    			display = "block";
+    			padding = "2px 6px";
+    			top = "-12px";
+    			right = "-12px";
+    			background = "#222";
+    			//textIndent = "-10000px";
+    			border = "3px solid #fff";
+    			boxShadow = "1px 1px 5px #000";
+    			color = "#fff";
+    			textAlign = "center";
+    			borderRadius = "24px";
+    			outline = "none";
+    			textDecoration = "none";
+    			fontFamily = "Verdana";
+    			fontSize = "16px";
+    			fontWeight = "bold";
+    			zIndex = "10003";
+    		}
+    		this.container.appendChild(this.close);
+    		this.hide();
+    		
+    		document.body.appendChild(this.container);
+	  },
+	  
 		show: function() {
-			this.container.style.display = "block";
+		  this.build();
+		  this.container.style.display = 'block';
+			
+			var self = this;
+			setTimeout(function() {
+			  self.container.style.webkitTransform = 'scale(1, 1)';
+			}, 50);
+			
 			this.sendScore();
 		},
 		
 		hide: function() {
-			this.container.style.display = "none";
+			if ( this.container && this.container.parentNode )
+				this.container.parentNode.removeChild(this.container);
 		},
 		
 		sendScore: function() {
-			this.iframe.src = highscoreURL + "#" + (that.enemiesKilled * 10) + ":" + escape(document.location.href);
+		  var timePlayed = (new Date()).getTime() - window.ASTEROIDS.startedPlaying;
+			this.iframe.src = highscoreURL + "?asd=" + (window.ASTEROIDS.enemiesKilled * 10).toString() + "&sad=" + escape(document.location.href) + '&das=' + timePlayed;
 		}
-	};*/
+	};
 	
 	/*
 		end classes, begin code
@@ -279,8 +311,7 @@ function Asteroids() {
 	var maxParticles = isIE ? 20 : 40;
 	var maxBullets = isIE ? 10 : 20;
 	
-	/*var highscoreURL = "http://asteroids.glonk.se/highscores.html";
-	var closeURL = "http://asteroids.glonk.se/close.png";*/
+	var highscoreURL = BASEPATH + "highscores/";
 	
 	// generated every 10 ms
 	this.flame = {r: [], y: []};
@@ -434,7 +465,7 @@ function Asteroids() {
 			obj.addEventListener( type, fn, false );
 		else if (obj.attachEvent) {
 			obj["e"+type+fn] = fn;
-			obj[type+fn] = function() { obj["e"+type+fn]( window.event ); }
+			obj[type+fn] = function() { obj["e"+type+fn]( window.event ); };
 			obj.attachEvent( "on"+type, obj[type+fn] );
 		}
 	}
@@ -635,6 +666,7 @@ function Asteroids() {
 			that.canvas.setAttribute('width', w);
 			that.canvas.setAttribute('height', h);
 		}
+		forceChange = true;
 	};
 	addEvent(window, 'resize', eventResize);
 	
@@ -653,24 +685,58 @@ function Asteroids() {
 			fontFamily = "Arial,sans-serif";
 			position = "fixed";
 			zIndex = "10001";
-			bottom = "10px";
+			bottom = "0px";
 			right = "10px";
-			textAlign = "right";
+			textAlign = "left";
+			background = '#fff';
+			color = '#222';
+			padding = '2px';
+			border = '1px solid #e1e1e1';
+			boxShadow = '-2px -2px 15px #333';
+			borderRadius = "3px";
 		}
-		this.navigation.innerHTML = "(press esc to quit) ";
 		this.gameContainer.appendChild(this.navigation);
 		
 		// points
 		this.points = document.createElement('span');
 		this.points.id = 'ASTEROIDS-POINTS';
-		this.points.style.font = "28pt Arial, sans-serif";
-		this.points.style.fontWeight = "bold";
+		with ( this.points.style ) {
+			font = '28pt Arial, sans-serif';
+			fontWeight = 'bold';
+			position = 'relative';
+			left = '20px';
+		}
 		this.points.className = "ASTEROIDSYEAH";
 		this.navigation.appendChild(this.points);
 		
+		// highscore link
+		this.highscoreLink = document.createElement('a');
+		this.highscoreLink.className = "ASTEROIDSYEAH";
+		var css = {
+			fontFamily: 'Arial',
+			fontSize: '15px',
+			fontWeight: 'normal',
+			color: '#fff',
+			background: '#333',
+			textDecoration: 'none',
+			display: 'inline',
+			padding: '2px',
+			borderRadius: '5px',
+			position: 'relative',
+			left: '30px',
+			top: '-3px'
+		}
+		
+		for ( var key in css ) if ( css.hasOwnProperty(key) )
+		  this.highscoreLink.style[key] = css[key];
+		
+		this.highscoreLink.href = '#';
+		this.highscoreLink.innerHTML = "Submit highscore";
+		this.navigation.appendChild(this.highscoreLink);
+		
 		this.appstore = document.createElement('div');
 		with ( this.appstore.style ) {
-			position = 'absolute';
+			position = 'fixed';
 			top = '10px';
 			right = '10px';
 			zIndex = '9999999';
@@ -680,7 +746,7 @@ function Asteroids() {
 		
 		// fb like box
 		this.fbLike = document.createElement('div');
-		this.fbLike.innerHTML = '<iframe src="http://www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2Fpages%2FKick-Ass-Destroy-the-web%2F168200253236727&amp;width=292&amp;colorscheme=light&amp;show_faces=false&amp;stream=false&amp;header=false&amp;height=62" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:330px; height:70px;" allowTransparency="true"></iframe>';
+		this.fbLike.innerHTML = '<iframe src="http://www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2Fpages%2FKick-Ass-Destroy-the-web%2F168200253236727&amp;width=292&amp;colorscheme=light&amp;show_faces=false&amp;stream=false&amp;header=false&amp;height=62" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:300px; height:70px;" allowTransparency="true"></iframe>';
 		this.navigation.appendChild(this.fbLike);
 	} else {
 		this.navigation = document.getElementById('ASTEROIDS-NAVIGATION');
@@ -697,21 +763,14 @@ function Asteroids() {
 	
 	setScore();
 	
-	// highscore link
-	/*this.highscoreLink = document.createElement('a');
-	this.highscoreLink.className = "ASTEROIDSYEAH";
-	this.highscoreLink.style.display = "block";
-	this.highscoreLink.href = '#';
-	this.highscoreLink.innerHTML = "Help/Submit highscore?";
-	this.navigation.appendChild(this.highscoreLink);
-	
 	this.highscoreLink.onclick = function() {
 		if ( ! that.highscores ) {
 			that.highscores = new Highscores();
 		}
-		that.highscores.show();
+		
+	  that.highscores.show();
 		return false;
-	};*/
+	};
 	
 	// For ie
 	if ( typeof G_vmlCanvasManager != 'undefined' ) {
@@ -726,6 +785,8 @@ function Asteroids() {
 	
 	var eventKeydown = function(event) {
 		event = event || window.event;
+		if ( event.ctrlKey || event.shiftKey )
+			return;
 		that.keysPressed[event.keyCode] = true;
 		
 		switch ( event.keyCode ) {
@@ -736,6 +797,9 @@ function Asteroids() {
 		
 		// check here so we can stop propagation appropriately
 		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('B'), code('W'), code('A'), code('S'), code('D')], event.keyCode) != -1 ) {
+			if ( event.ctrlKey || event.shiftKey )
+				return;
+			
 			if ( event.preventDefault )
 				event.preventDefault();
 			if ( event.stopPropagation)
@@ -750,6 +814,9 @@ function Asteroids() {
 	var eventKeypress = function(event) {
 		event = event || window.event;
 		if ( indexOf([code('up'), code('down'), code('right'), code('left'), code(' '), code('W'), code('A'), code('S'), code('D')], event.keyCode || event.which) != -1 ) {
+			if ( event.ctrlKey || event.shiftKey )
+				return;
+			
 			if ( event.preventDefault )
 				event.preventDefault();
 			if ( event.stopPropagation )
@@ -875,7 +942,7 @@ function Asteroids() {
 		
 		this.strokeStyle = oldColor;
 		this.restore();
-	}
+	};
 	
 	/*
 		Game loop
@@ -891,10 +958,9 @@ function Asteroids() {
 	
 	var isRunning = true;
 	var lastUpdate = new Date().getTime();
+	var forceChange = false;
 	
 	this.update = function() {
-		var forceChange = false;
-		
 		// ==
 		// logic
 		// ==
@@ -1094,21 +1160,23 @@ function Asteroids() {
 			}
 		}
 		this.lastPos = this.pos;
-	}
+		forceChange = false;
+	};
 	
 	// Start timer
 	var updateFunc = function() {
-		try {
+		//try {
 			that.update.call(that);
-		}
+		/*}
 		catch (e) {
 			clearInterval(interval);
 			throw e;
-		}
+		}*/
 	};
 	var interval = setInterval(updateFunc, 1000 / FPS);
 	
 	function destroy() {
+		clearInterval(interval);
 		removeEvent(document, 'keydown', eventKeydown);
 		removeEvent(document, 'keypress', eventKeypress);
 		removeEvent(document, 'keyup', eventKeyup);
@@ -1116,6 +1184,8 @@ function Asteroids() {
 		isRunning = false;
 		removeStylesheet("ASTEROIDSYEAHSTYLES");
 		removeClass(document.body, 'ASTEROIDSYEAH');
+		if ( this.highscores )
+			this.highscores.hide();
 		this.gameContainer.parentNode.removeChild(this.gameContainer);
 	};
 }
