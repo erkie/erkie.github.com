@@ -200,8 +200,9 @@ function Asteroids() {
     			height = "500px";
     			boxShadow = MsBoxShadow = OBoxShadow = MozBoxShadow = WebkitBoxShadow = "0 0 25px #000";
     			zIndex = "1000002";
-    			webkitTransform = 'scale(0, 0)';
-    			webkitTransition = "-webkit-transform 500ms";
+				//webkitTransform causes a bug where you can't click anything in the iframe if the scroll is not top
+    			//webkitTransform = 'scale(0, 0)';
+    			//webkitTransition = "-webkit-transform 500ms";
     			background = '#222';
     		};
     		document.body.appendChild(this.container);
@@ -253,7 +254,7 @@ function Asteroids() {
 			
 			var self = this;
 			setTimeout(function() {
-			  self.container.style.webkitTransform = 'scale(1, 1)';
+			  //self.container.style.webkitTransform = 'scale(1, 1)';
 			}, 50);
 			
 			this.sendScore();
@@ -742,7 +743,7 @@ function Asteroids() {
 			zIndex = '9999999';
 		}
 		this.appstore.innerHTML = '<a href="http://itunes.apple.com/us/app/kick-ass-destroy-the-web/id436623109?mt=8&ls=1"><img src="http://erkie.github.com/appstore.png" style="border: none" alt="Get the mobile version" /></a>';
-		document.body.appendChild(this.appstore);
+		this.gameContainer.appendChild(this.appstore);
 		
 		// fb like box
 		this.fbLike = document.createElement('div');
