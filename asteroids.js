@@ -743,12 +743,17 @@ function Asteroids() {
 			zIndex = '9999999';
 		}
 		this.appstore.innerHTML = '<a href="http://itunes.apple.com/us/app/kick-ass-destroy-the-web/id436623109?mt=8&ls=1"><img src="http://erkie.github.com/appstore.png" style="border: none" alt="Get the mobile version" /></a>';
-		this.gameContainer.appendChild(this.appstore);
+		document.body.appendChild(this.appstore);
 		
 		// fb like box
 		this.fbLike = document.createElement('div');
 		this.fbLike.innerHTML = '<iframe src="http://www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2Fpages%2FKick-Ass-Destroy-the-web%2F168200253236727&amp;width=292&amp;colorscheme=light&amp;show_faces=false&amp;stream=false&amp;header=false&amp;height=62" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:300px; height:70px;" allowTransparency="true"></iframe>';
 		this.navigation.appendChild(this.fbLike);
+		
+		// Don't show appstore on frontpage, because they are already present
+		if ( document.location.href === 'http://erkie.github.com/' ) {
+			this.appstore.style.display = "none";
+		}
 	} else {
 		this.navigation = document.getElementById('ASTEROIDS-NAVIGATION');
 		this.points = document.getElementById('ASTEROIDS-POINTS');
@@ -1188,6 +1193,7 @@ function Asteroids() {
 		if ( this.highscores )
 			this.highscores.hide();
 		this.gameContainer.parentNode.removeChild(this.gameContainer);
+		this.appstore.parentNode.removeChild(this.appstore);
 	};
 }
 
