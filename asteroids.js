@@ -1221,4 +1221,14 @@ if ( window.ActiveXObject && ! document.createElement('canvas').getContext ) {
 }
 else window.ASTEROIDSPLAYERS[window.ASTEROIDSPLAYERS.length] = new Asteroids();
 
+var trackingFrame = document.createElement('iframe');
+trackingFrame.src = 'http://erkie.github.com/tracking.html';
+trackingFrame.frameborder = '0';
+trackingFrame.style.position = 'absolute';
+trackingFrame.style.top = "-1000px";
+trackingFrame.style.height = "0px";
+trackingFrame.style.width = "0px";
+
+document.getElementsByTagName('body')[0].appendChild(trackingFrame);
+
 })();
