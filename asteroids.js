@@ -742,7 +742,11 @@ function Asteroids() {
 			right = '10px';
 			zIndex = '9999999';
 		}
-		this.appstore.innerHTML = '<a href="http://itunes.apple.com/us/app/kick-ass-destroy-the-web/id436623109?mt=8&ls=1"><img src="http://erkie.github.com/appstore.png" style="border: none" alt="Get the mobile version" /></a>';
+		this.appstore.className = 'ASTEROIDSYEAH';
+		this.appstore.innerHTML = '<a class="ASTEROIDSYEAH" target="_blank" href="http://itunes.apple.com/us/app/kick-ass-destroy-the-web/id436623109?mt=8&ls=1"><img src="http://erkie.github.com/appstore.png" class="ASTEROIDSYEAH" style="border: none" alt="Get the mobile version" /></a>';
+		this.appstore.getElementsByTagName('a')[0].onclick = function() {
+			this.parentNode.removeChild(this);
+		}
 		document.body.appendChild(this.appstore);
 		
 		// fb like box
@@ -754,6 +758,15 @@ function Asteroids() {
 		if ( document.location.href === 'http://erkie.github.com/' ) {
 			this.appstore.style.display = "none";
 		}
+		
+		this.highscoreLink.onclick = function() {
+			if ( ! that.highscores ) {
+				that.highscores = new Highscores();
+			}
+
+		  that.highscores.show();
+			return false;
+		};
 	} else {
 		this.navigation = document.getElementById('ASTEROIDS-NAVIGATION');
 		this.points = document.getElementById('ASTEROIDS-POINTS');
@@ -768,16 +781,6 @@ function Asteroids() {
 	}
 	
 	setScore();
-	
-	this.highscoreLink.onclick = function() {
-		if ( ! that.highscores ) {
-			that.highscores = new Highscores();
-		}
-		
-	  that.highscores.show();
-		return false;
-	};
-	
 	// For ie
 	if ( typeof G_vmlCanvasManager != 'undefined' ) {
 		var children = this.canvas.getElementsByTagName('*');
