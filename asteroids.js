@@ -419,10 +419,6 @@ function Asteroids() {
 		return deg * 0.0174532925;
 	};
 	
-	function degrees(rad) {
-		return rad * 57.2957795;
-	};
-	
 	function random(from, to) {
 		return Math.floor(Math.random() * (to + 1) + from);
 	};
@@ -480,12 +476,6 @@ function Asteroids() {
 			obj["e"+type+fn] = null;
 		}
 	}
-	
-	function arrayRemove(array, from, to) {
-		var rest = array.slice((to || from) + 1 || array.length);
-		array.length = from < 0 ? array.length + from : from;
-		return array.push.apply(array, rest);
-	};
 	
 	function applyVisibility(vis) {
 		for ( var i = 0, p; p = window.ASTEROIDSPLAYERS[i]; i++ ) {
@@ -1096,7 +1086,6 @@ function Asteroids() {
 				indexOf(ignoredTypes, murdered.tagName.toUpperCase()) == -1 &&
 				hasOnlyTextualChildren(murdered) && murdered.className != "ASTEROIDSYEAH"
 			) {
-				didKill = true;
 				addParticles(this.bullets[i].pos);
 				this.dying.push(murdered);
 			
